@@ -121,7 +121,6 @@ const resizeReset = () => {
   for (let i = bar.distance * 3 + bar.width / 2; i < w.value - bar.distance * 3; i += bar.width + bar.distance) {
     bars.push(new Bar(i, (h.value + bar.length) * 0.5));
   }
-  console.log("[ bars ]-109", bars);
 
 }
 
