@@ -1,136 +1,73 @@
 <template>
-  <canvas ref='canvas'></canvas>
+  <canvas ref='canvasA'></canvas>
 </template>
 <script setup lang='ts'>
-import { ref, reactive, onMounted } from 'vue'
-const canvas = ref<HTMLCanvasElement>()
-
-let w = ref(0);
-let h = ref(0);
-let mouse = reactive({
-  x: 0,
-  y: 0
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
+const canvasA = ref<HTMLCanvasElement>()
+let requestAnimationId = 0;
+let ctx = ref<CanvasRenderingContext2D | null>(null);
+const canvas = reactive({
+  w: 0,
+  h: 0,
+  fps: 0
 })
-let bar = {
-  width: 20,
-  distance: 16,
-  speed: 8,
-  length: 400
-}
-let ctx: CanvasRenderingContext2D | null = null;
-let bars: Bar[] = [];
-class Bar {
-  x: number;
-  y: number;
-  lineY: number;
-  targetY: number;
-  hue: number;
+const template = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()'
+const templateArr = template.split('')
+const fontSize = 16
+const fontStyle = `${fontSize}px Arial`
+const drops: number[] = []
+let lastTime = performance.now()
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
-    this.lineY = y;
-    this.targetY = y;
-    this.hue = Math.floor(Math.random() * 360);
-  }
-  draw() {
-    if (ctx) {
-      // draw top arc
-      ctx.beginPath();
-      ctx.arc(this.x, this.y - bar.length * 1.05, bar.width * 0.2, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(${this.hue}, 80%, 40%, 0.8)`;
-      ctx.fill();
-      ctx.closePath();
-      // draw bottom arc
-      let tmp = (this.y - this.lineY) / bar.length * 100 / 1.5;
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, bar.width * 0.8, 0, Math.PI * 2);
-      ctx.fillStyle = `hsla(220, 100%, ${tmp}%, 1)`;
-      ctx.fill();
-      ctx.closePath();
-
-      // draw bar 
-      ctx.beginPath();
-      ctx.moveTo(this.x, this.y);
-      ctx.lineTo(this.x, this.lineY);
-      ctx.lineWidth = bar.width;
-      ctx.lineCap = "round";
-
-      ctx.strokeStyle = `hsla(${this.hue}, 80%, 20%, 0.6)`;
-      ctx.stroke();
-      ctx.closePath();
+const draw = () => {
+  calcFPS()
+  ctx.value!.fillStyle = 'rgba(0,0,0,0.05)'
+  ctx.value!.fillRect(0, 0, canvas.w, canvas.h)
+  ctx.value!.fillStyle = '#0F0'
+  ctx.value!.font = fontStyle
+  for (let i = 0; i < drops.length; i++) {
+    const text = templateArr[Math.floor(Math.random() * templateArr.length)]
+    ctx.value?.fillText(text, i * fontSize, drops[i] * fontSize)
+    if (drops[i] * fontSize > canvas.h && Math.random() > 0.95) {
+      drops[i] = 0
     }
-
+    drops[i] += 1
   }
-  update() {
-    if (mouse.x !== undefined) {
-      let distanceX = Math.pow(Math.abs(this.x - mouse.x), 2) * 0.005;
-      this.targetY = (this.y - bar.length) + distanceX;
-      if (this.targetY > this.y) {
-        this.targetY = this.y;
-      }
-    } else {
-      this.targetY = this.y;
+}
+const initCanvas = () => {
+  if (canvasA.value) {
+    canvas.w = canvasA.value.width = window.innerWidth || 600;
+    canvas.h = canvasA.value.height = window.innerHeight || 600;
+    ctx.value = canvasA.value?.getContext('2d') as CanvasRenderingContext2D;   //获取canvas的上下文
+    let columns  = Math.floor(canvas.w / fontSize)
+    for (let i = 0; i < columns ; i++) {
+      drops[i] = 1
     }
-
-    let distanceY = Math.abs(this.lineY - this.targetY);
-
-    if (this.lineY < this.targetY) {
-      if (distanceY < bar.speed) {
-        this.lineY += distanceY;
-      } else {
-        this.lineY += bar.speed;
-      }
-    } else if (this.lineY > this.targetY) {
-      if (distanceY < bar.speed) {
-        this.lineY -= distanceY;
-      } else {
-        this.lineY -= bar.speed;
-      }
-    }
+    amimate()
   }
 }
-
-const animationLoop = () => {
-  ctx?.clearRect(0, 0, w.value, h.value);
-  drawScene();
-  requestAnimationFrame(animationLoop);
+const amimate = () => {
+  requestAnimationId = window.requestAnimationFrame(amimate)
+  draw()
 }
-const drawScene = () => {
-  bars.forEach((b) => {
-    b.update();
-    b.draw();
-  })
+//计算屏幕刷新率
+const calcFPS = () => {
+  const now = performance.now()
+  const deltaTime = now - lastTime
+  lastTime = now
+  canvas.fps = Math.round(1000 / deltaTime)
+    //给文字添加背景
+ ctx.value!.fillStyle = 'rgba(0,0,0,1)'
+  ctx.value!.fillRect(0, 0, 60, 20)
+  //填充文字到左上角
+  ctx.value!.fillStyle = '#FFF'
+  ctx.value!.font = '16px Sans-serif'
+  ctx.value!.fillText(`FPS:${canvas.fps}`, 10, 20)
 }
-
-const mousemove = (e: MouseEvent) => {
-  mouse.x = e.x;
-  mouse.y = e.y;
-}
-
-const mouseout = () => {
-  mouse.x = 0;
-  mouse.y = 0;
-}
-const resizeReset = () => {
-  if (canvas.value) {
-    w.value = canvas.value.width = window.innerWidth || 0;
-    h.value = canvas.value.height = window.innerHeight || 600;
-  }
-  bars = [];
-  for (let i = bar.distance * 3 + bar.width / 2; i < w.value - bar.distance * 3; i += bar.width + bar.distance) {
-    bars.push(new Bar(i, (h.value + bar.length) * 0.5));
-  }
-
-}
-
 onMounted(() => {
-  ctx = canvas.value?.getContext('2d') as CanvasRenderingContext2D;
-  window.addEventListener('resize', resizeReset);
-  window.addEventListener('mousemove', mousemove);
-  window.addEventListener('mouseout', mouseout);
-  resizeReset()
-  animationLoop()
+  initCanvas();
+})
+onUnmounted(() => {
+  window.cancelAnimationFrame(requestAnimationId)
 })
 </script>
 <style scoped lang='scss'></style>
