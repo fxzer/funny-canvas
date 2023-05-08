@@ -1,5 +1,5 @@
 <template>
-  <canvas ref='canvasA'></canvas>
+  <canvas ref='canvasA'  class="backdrop-blur"></canvas>
 </template>
 <script setup lang='ts'>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
