@@ -5,7 +5,6 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-
 const canvas = ref<HTMLCanvasElement>()
 const ctx = ref<CanvasRenderingContext2D | null>(null)
 const width = ref(0)
@@ -66,11 +65,6 @@ const draw = () => {
 }
 // 执行代码
 const resume = () => {
-  ctx.value!.globalCompositeOperation = 'source-over'
-  ctx.value!.shadowBlur = 0
-  ctx.value!.fillStyle = 'hsla(0,0%,0%,0.4)'
-  ctx.value!.fillRect(0, 0, width.value, height.value)
-
   ctx.value!.shadowColor = 'hsla(120,100%,50%,0.5)'
   ctx.value!.shadowBlur = 2
   ctx.value!.fillStyle = 'hsla(120,100%,20%,1)'
