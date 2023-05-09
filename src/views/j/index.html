@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      body,
+      html {
+        margin: 0px;
+        padding: 0px;
+        position: fixed;
+        background: rgb(0, 0, 0);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <script>
+      // 当文档加载完毕时运行函数
+      window.onload = function () {
+        // 获取 canvas 元素并将其上下文设为 2D
+        let canvas = document.querySelector("#canvas");
+        let ctx = canvas.getContext("2d");
+        // 设置画布的宽度和高度为窗口的宽度和高度
+        (w = canvas.width = window.innerWidth),
+          (h = canvas.height = window.innerHeight),
+          // 初始化鼠标位置为 false
+          (mouse = { x: false, y: false }),
+          // 记录上一个鼠标位置
+          (last_mouse = {});
+
+        // 计算两个点之间的距离
+        function dist(p1x, p1y, p2x, p2y) {
+          return Math.sqrt(Math.pow(p2x - p1x, 2) + Math.pow(p2y - p1y, 2));
+        }
+
+        // 定义线段类
+        class segment {
+          constructor(parent, l, a, first) {
+            // 判断是否是第一个线段
+            this.first = first;
+            // 如果是第一个线段，初始化位置为 parent 的位置
+            if (first) {
+              this.pos = {
+                x: parent.x,
+                y: parent.y,
+              };
+              // 如果不是第一个线段，初始化位置为上一个线段的 nextPos
+            } else {
+              this.pos = {
+                x: parent.nextPos.x,
+                y: parent.nextPos.y,
+              };
+            }
+            // 线段长度和角度
+            this.l = l;
+            this.ang = a;
+            // 计算下一个位置
+            this.nextPos = {
+              x: this.pos.x + this.l * Math.cos(this.ang),
+              y: this.pos.y + this.l * Math.sin(this.ang),
+            };
+          }
+          // 更新线段的位置，使其追随目标点
+          update(t) {
+            this.ang = Math.atan2(t.y - this.pos.y, t.x - this.pos.x);
+            this.pos.x = t.x + this.l * Math.cos(this.ang - Math.PI);
+            this.pos.y = t.y + this.l * Math.sin(this.ang - Math.PI);
+            this.nextPos.x = this.pos.x + this.l * Math.cos(this.ang);
+            this.nextPos.y = this.pos.y + this.l * Math.sin(this.ang);
+          }
+          // 退化线段的位置，以保持连续性
+          fallback(t) {
+            this.pos.x = t.x;
+            this.pos.y = t.y;
+            this.nextPos.x = this.pos.x + this.l * Math.cos(this.ang);
+            this.nextPos.y = this.pos.y + this.l * Math.sin(this.ang);
+          }
+          // 画出线段
+          show() {
+            ctx.lineTo(this.nextPos.x, this.nextPos.y);
+          }
+        }
+
+        // 定义触手类
+        class tentacle {
+          constructor(x, y, l, n, a) {
+            // 触手的起始位置、长度、线段数量和角度
+            this.x = x;
+            this.y = y;
+            this.l = l;
+            this.n = n;
+            this.t = {};
+            this.rand = Math.random();
+            this.segments = [new segment(this, this.l / this.n, 0, true)];
+            for (let i = 1; i < this.n; i++) {
+              this.segments.push(
+                new segment(this.segments[i - 1], this.l / this.n, 0, false)
+              );
+            }
+          }
+          move(last_target, target) {
+            // 更新当前目标点和角度
+            this.angle = Math.atan2(target.y - this.y, target.x - this.x);
+            // 计算距离和时间间隔
+            this.dt =
+              dist(last_target.x, last_target.y, target.x, target.y) + 5;
+            // 根据当前目标点和时间间隔计算新的目标点
+            this.t = {
+              x: target.x - 0.8 * this.dt * Math.cos(this.angle),
+              y: target.y - 0.8 * this.dt * Math.sin(this.angle),
+            };
+            // 更新第一个线段以跟随目标点
+            if (this.t.x) {
+              this.segments[this.n - 1].update(this.t);
+            } else {
+              this.segments[this.n - 1].update(target);
+            }
+            // 更新其他线段以跟随前面的线段
+            for (let i = this.n - 2; i >= 0; i--) {
+              this.segments[i].update(this.segments[i + 1].pos);
+            }
+            // 如果触手到达了目标点，则让它们向后倒退
+            if (
+              dist(this.x, this.y, target.x, target.y) <=
+              this.l + dist(last_target.x, last_target.y, target.x, target.y)
+            ) {
+              this.segments[0].fallback({ x: this.x, y: this.y });
+              for (let i = 1; i < this.n; i++) {
+                this.segments[i].fallback(this.segments[i - 1].nextPos);
+              }
+            }
+          }
+          show(target) {
+            if (dist(this.x, this.y, target.x, target.y) <= this.l) {
+              ctx.globalCompositeOperation = "lighter";
+              ctx.beginPath();
+              ctx.lineTo(this.x, this.y);
+              for (let i = 0; i < this.n; i++) {
+                this.segments[i].show();
+              }
+              ctx.strokeStyle =
+                "hsl(" +
+                (this.rand * 60 + 180) +
+                ",100%," +
+                (this.rand * 60 + 25) +
+                "%)";
+              ctx.lineWidth = this.rand * 2;
+              ctx.lineCap = "round";
+              ctx.lineJoin = "round";
+              ctx.stroke();
+              ctx.globalCompositeOperation = "source-over";
+            }
+          }
+          show2(target) {
+            ctx.beginPath();
+            if (dist(this.x, this.y, target.x, target.y) <= this.l) {
+              ctx.arc(this.x, this.y, 2 * this.rand + 1, 0, 2 * Math.PI);
+              ctx.fillStyle = "white";
+            } else {
+              ctx.arc(this.x, this.y, this.rand * 2, 0, 2 * Math.PI);
+              ctx.fillStyle = "darkcyan";
+            }
+            ctx.fill();
+          }
+        }
+
+        let maxl = 300,
+          minl = 50,
+          n = 30,
+          numt = 500,
+          tent = [],
+          clicked = false,
+          target = { x: 0, y: 0 },
+          last_target = {},
+          t = 0,
+          q = 10;
+
+        for (let i = 0; i < numt; i++) {
+          tent.push(
+            new tentacle(
+              Math.random() * w,
+              Math.random() * h,
+              Math.random() * (maxl - minl) + minl,
+              n,
+              Math.random() * 2 * Math.PI
+            )
+          );
+        }
+        function draw() {
+          //animation
+          if (mouse.x) {
+            target.errx = mouse.x - target.x;
+            target.erry = mouse.y - target.y;
+          } else {
+            target.errx =
+              w / 2 +
+              ((h / 2 - q) * Math.sqrt(2) * Math.cos(t)) /
+                (Math.pow(Math.sin(t), 2) + 1) -
+              target.x;
+            target.erry =
+              h / 2 +
+              ((h / 2 - q) * Math.sqrt(2) * Math.cos(t) * Math.sin(t)) /
+                (Math.pow(Math.sin(t), 2) + 1) -
+              target.y;
+          }
+
+          target.x += target.errx / 10;
+          target.y += target.erry / 10;
+
+          t += 0.01;
+
+          ctx.beginPath();
+          ctx.arc(
+            target.x,
+            target.y,
+            dist(last_target.x, last_target.y, target.x, target.y) + 5,
+            0,
+            2 * Math.PI
+          );
+          ctx.fillStyle = "hsl(210,100%,80%)";
+          ctx.fill();
+
+          for (i = 0; i < numt; i++) {
+            tent[i].move(last_target, target);
+            tent[i].show2(target);
+          }
+          for (i = 0; i < numt; i++) {
+            tent[i].show(target);
+          }
+          last_target.x = target.x;
+          last_target.y = target.y;
+        }
+
+        canvas.addEventListener(
+          "mousemove",
+          function (e) {
+            last_mouse.x = mouse.x;
+            console.log("[ mouse.x ]-241", mouse.x);
+            last_mouse.y = mouse.y;
+
+            mouse.x = e.pageX - this.offsetLeft;
+            mouse.y = e.pageY - this.offsetTop;
+          },
+          false
+        );
+
+        canvas.addEventListener("mouseleave", function (e) {
+          mouse.x = 0;
+          mouse.y = 0;
+        });
+
+        canvas.addEventListener(
+          "mousedown",
+          function (e) {
+            clicked = true;
+          },
+          false
+        );
+
+        canvas.addEventListener(
+          "mouseup",
+          function (e) {
+            clicked = false;
+          },
+          false
+        );
+
+        function loop() {
+          window.requestAnimationFrame(loop);
+          ctx.clearRect(0, 0, w, h);
+          draw();
+        }
+
+        window.addEventListener("resize", function () {
+          (w = canvas.width = window.innerWidth),
+            (h = canvas.height = window.innerHeight);
+          loop();
+        });
+
+        loop();
+        setInterval(loop, 1000 / 60);
+      };
+    </script>
+  </body>
+</html>
