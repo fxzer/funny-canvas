@@ -2,7 +2,7 @@
   <div id="layout" class="w-full h-full relative">
     <Logo />
     <router-view />
-    <NavMenu :navs="navs" />
+    <NavMenu :navs="navList" />
     <Arrow class="left-4 rotate-180 arrow-common" @click="switchHandler(Direction.prev)" />
     <Arrow class="right-4  arrow-common" @click="switchHandler(Direction.next)" />
     <button class="absolute top-4 right-4" @click="themeToggle">
@@ -14,12 +14,20 @@
 <script setup lang='ts'>
 import { useRoute, useRouter } from 'vue-router';
 import { useDark, useToggle } from '@vueuse/core'
-
+import { reactive } from 'vue'
 import NavMenu from './NavMenu.vue';
 import Arrow from '@/components/Arrow.vue';
 import Logo from '@/components/Logo.vue';
-
-const navs = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))
+import imgs from './imgs'
+const navs:Nav[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i)).map(( letter ,index) => {
+  return {
+    id: index,
+    label: letter,
+    hover:false,  
+    src: imgs[letter],
+  }
+})
+const navList =  reactive(navs)
 const currentRouter = useRouter()
 const currentRoute = useRoute()
 
@@ -28,11 +36,10 @@ enum Direction {
   next = 1
 }
 const switchHandler = (direction: Direction) => {
-  let edgeIdx = direction == Direction.prev ? 0 : navs.length - 1
-  let isEdge = navs.indexOf(currentRoute.path.slice(1)) === edgeIdx
-  let nextIdx = navs.indexOf(currentRoute.path.slice(1)) + direction
-  let edgeNextPath = direction == Direction.prev ? '/' + navs[navs.length - 1] : '/' + navs[0]
-  let nextPath = isEdge ? edgeNextPath : navs[nextIdx]
+  let isEdge = currentRoute.path.slice(1) === navs[0].label || currentRoute.path.slice(1) === navs[navs.length - 1].label
+  let nextIdx = navs.findIndex((label) => label.label === currentRoute.path.slice(1)) + direction
+  let edgeNextPath = direction == Direction.prev ? '/' + navs[navs.length - 1].label : '/' + navs[0].label
+  let nextPath = isEdge ? edgeNextPath : navs[nextIdx].label
   currentRouter.push(nextPath)
 }
 
