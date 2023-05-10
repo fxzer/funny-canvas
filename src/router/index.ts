@@ -11,7 +11,7 @@ const routes = [
   ...canvasRoutes
 ]
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory('/funny-canvas/'),
   routes,
 })
 router.beforeEach((to, _, next) => {
