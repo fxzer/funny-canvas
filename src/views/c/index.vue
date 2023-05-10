@@ -86,7 +86,7 @@ const fillText = () => {
          }
       }
    }
-   console.log("[ particlesArray ]-87", particlesArray.length);
+   console.log("[ particlesArray ]-87", particlesArray);
 }
 //计算每个粒子的位置偏移，始终保持居中展示
 const calculateOffset = (x: number, y: number, fs: number, text: string) => {
@@ -123,6 +123,7 @@ const animate = () => {
    }
    requestAnimationFrame(animate);
 }
+
 onMounted(() => {
    initCanvas();
    animate()

@@ -5,7 +5,7 @@ import canvasRoutes from './canvas-routes'
 const routes = [
   {
     path: '/',
-    redirect: '/a',
+    redirect: '/k',
 
   },
   ...canvasRoutes

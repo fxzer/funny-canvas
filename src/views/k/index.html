@@ -25,7 +25,7 @@ var particleAlphabet = {
     this.y = y;
     this.radius = 3.5;
     this.draw = function(ctx) {
-      ctx.save();
+      ctx.save(); 
       ctx.translate(this.x, this.y);
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, this.radius, this.radius);
@@ -93,6 +93,7 @@ var particleAlphabet = {
     for (var i = 0, num = particleAlphabet.particles.length; i < num; i++) {
       p = particleAlphabet.particles[i];
       pPos = particleAlphabet.particlePositions[i];
+      //
       if (particleAlphabet.particles.indexOf(p) === particleAlphabet.particlePositions.indexOf(pPos)) {
       p.x += (pPos.x - p.x) * .3;
       p.y += (pPos.y - p.y) * .3;
