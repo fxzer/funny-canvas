@@ -1,0 +1,1 @@
+import{_ as e,c as s,e as o,g as t}from"./index-4fe0a302.js";const c={},_={class:"o"},n=t("h1",{class:"text-3xl"},"o works !!!",-1),a=[n];function r(d,i){return s(),o("div",_,a)}const f=e(c,[["render",r]]);export{f as default};

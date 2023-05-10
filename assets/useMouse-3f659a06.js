@@ -1,0 +1,1 @@
+import{o as u,b as t,r as s}from"./index-4fe0a302.js";function r(e,n,o){u(()=>e.addEventListener(n,o)),t(()=>e.removeEventListener(n,o))}function a(){const e=s(0),n=s(0);return r(window,"mousemove",o=>{e.value=o.pageX,n.value=o.pageY}),{x:e,y:n}}export{a as u};
