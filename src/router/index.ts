@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import { useTitle } from '@vueuse/core'
 import canvasRoutes from './canvas-routes'
 
@@ -11,7 +11,7 @@ const routes = [
   ...canvasRoutes
 ]
 const router = createRouter({
-  history: createWebHistory('/funny-canvas/'),
+  history: createWebHashHistory(),
   routes,
 })
 router.beforeEach((to, _, next) => {
