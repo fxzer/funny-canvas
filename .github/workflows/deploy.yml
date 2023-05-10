@@ -1,0 +1,38 @@
+name: Deploy GitHub Pages And Sync to Gitee
+
+# 触发条件：在 push 到 main 分支后
+on:
+  push:
+    branches:
+      - main
+    paths-ignore: # 下列文件的变更不触发部署
+      - LICENSE
+# 任务
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest #部署运行环境搭建
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@main
+        with:
+          persist-credentials: false
+          fetch-depth: 0 #github代码拉取深度
+      - name: Setup Node  🎬
+        uses: actions/setup-node@main
+        with:
+          node-version: "lts/*"
+      # 安装 pnpm 
+      - name: Install pnpm
+        run: |
+          npm install -g pnpm
+      - name: Build 🔧 
+        run: |
+          pnpm i
+          pnpm build
+          ls -lrth
+      - name: 📲 Push To GitHub Pages
+        uses: ftnext/action-push-ghpages@v1.0.0
+        with:
+          build_dir: dist
+          github_token: ${{ secrets.DEPLOY_TOKEN }}
+          
