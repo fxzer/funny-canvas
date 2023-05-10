@@ -1,3 +1,4 @@
+import { RouteRecordRaw } from 'vue-router'
 export default [
   {
     "path": "/a",
@@ -129,4 +130,4 @@ export default [
     "name": "Z",
     "component": () => import('@/views/z/index.vue')
   }
-]  
+]   as RouteRecordRaw[]

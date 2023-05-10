@@ -11,7 +11,7 @@
          加载中...
       </div>
       <audio ref="audioA" controls class="w-80 left-0 right-0 mx-auto z-50 absolute bottom-20 ">
-         <source src="../../assets/music/The theme of Bangaichi.mp3">
+         <source src="../../assets/music/bangaichi.mp3">
       </audio>
    </div>
 </template>

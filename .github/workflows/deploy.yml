@@ -49,7 +49,6 @@ jobs:
 
       - name: Build 🔧
         run: |
-          pnpm i
           pnpm build
           ls -lrth
       - name: 📲 Push To GitHub Pages

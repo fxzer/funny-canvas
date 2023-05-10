@@ -29,6 +29,7 @@ let maxl = 300,
   last_target = {x: 0, y: 0},
   t = 0,
   q = 10;
+  console.log("[ clicked ]-28", clicked);
 
 const initData = () => {
   for (let i = 0; i < numt; i++) {
@@ -138,7 +139,7 @@ class segment {
   }
   // 画出线段
   show() {
-    ctx.value.value!.lineTo(this.nextPos.x, this.nextPos.y);
+    ctx.value!.lineTo(this.nextPos.x, this.nextPos.y);
   }
 }
 
@@ -154,6 +155,7 @@ class tentacle {
   dt: number = 0;
   segments: segment[];
   constructor(x: number, y: number, l: number, n: number, a: number) {
+    console.log("[ a ]-158", a);
     // 触手的起始位置、长度、线段数量和角度
     this.x = x;
     this.y = y;
@@ -164,7 +166,7 @@ class tentacle {
     this.segments = [new segment(this, this.l / this.n, 0, true)];
     for (let i = 1; i < this.n; i++) {
       this.segments.push(
-        new segment(this.segments[i - 1], this.l / this.n, 0, false)
+        new segment(this.segments[i - 1] as any, this.l / this.n, 0, false)
       );
     }
   }

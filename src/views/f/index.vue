@@ -89,7 +89,7 @@ const fillImage = () => {
       image.data = data;
       // grayify(data)
       handleRGB(data, width, height)
-      ctx.value?.putImageData(new ImageData(data, width, height), image.x, image.y);
+      ctx.value?.putImageData(new ImageData(data as any, width, height), image.x, image.y);
       initParticles()
    }
 }

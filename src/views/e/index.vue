@@ -4,7 +4,6 @@
  
 <script  lang="ts" setup>
 import * as THREE from 'three'
-import { Camera, Scene, Renderer } from 'three'
 import { defineProps, onUnmounted, watch } from 'vue'
 import { ref,onMounted } from 'vue'
 const props = defineProps({
@@ -31,7 +30,7 @@ const props = defineProps({
 })
 const SEPARATION = 100
 const dotColor = ref<string>('hsl(75,100%, 50%)')
-let container, camera: Camera, scene: Scene, renderer: Renderer
+let container:any, camera: any, scene: any, renderer: any
 
 let particles:any,
    count = 0
