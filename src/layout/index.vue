@@ -36,11 +36,23 @@ enum Direction {
   next = 1
 }
 const switchHandler = (direction: Direction) => {
-  let isEdge = currentRoute.path.slice(1) === navs[0].label || currentRoute.path.slice(1) === navs[navs.length - 1].label
-  let nextIdx = navs.findIndex((label) => label.label === currentRoute.path.slice(1)) + direction
-  let edgeNextPath = direction == Direction.prev ? '/' + navs[navs.length - 1].label : '/' + navs[0].label
-  let nextPath = isEdge ? edgeNextPath : navs[nextIdx].label
-  currentRouter.push(nextPath)
+  const letter = currentRoute.path.slice(1)
+  const lastLetter = navs[navs.length - 1].label
+  if(direction == Direction.prev){
+    if(letter === navs[0].label){
+      currentRouter.push('/' + lastLetter)
+    }else{
+      let nextIdx = navs.findIndex((label) => label.label === letter) + direction
+      currentRouter.push('/' + navs[nextIdx].label)
+    }
+  }else{
+    if(letter === lastLetter){
+      currentRouter.push('/' + navs[0].label)
+    }else{
+      let nextIdx = navs.findIndex((label) => label.label === letter) + direction
+      currentRouter.push('/' + navs[nextIdx].label)
+    }
+  }
 }
 
 const isDark = useDark()
