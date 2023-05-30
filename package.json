@@ -12,6 +12,7 @@
   "dependencies": {
     "@types/three": "^0.152.0",
     "@vueuse/core": "^10.1.2",
+    "colorthief": "^2.4.0",
     "sass": "^1.62.1",
     "three": "^0.152.2",
     "vue": "^3.2.47",
