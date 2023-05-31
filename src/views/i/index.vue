@@ -9,10 +9,10 @@ const pics = [pic1, pic2, pic3, pic4];
 
 const index = ref(0);
 const colorThief = new ColorThief();
-const enterHandler = (e: EventTarget, i: number) => {
+const enterHandler = (e: MouseEvent, i: number) => {
   const img = e?.target as HTMLImageElement;
   let colorTop3 = colorThief.getPalette(img, 3);
-  const [c1, c2, c3] = colorTop3.map(c => `rgb(${c[0]}, ${c[1]}, ${c[2]})`);
+  const [c1, c2, c3] = colorTop3.map(( c: number[]) => `rgb(${c[0]}, ${c[1]}, ${c[2]})`);
    document.body.style.setProperty("--color1", c1);
    document.body.style.setProperty("--color2", c2);
    document.body.style.setProperty("--color3", c3);   
