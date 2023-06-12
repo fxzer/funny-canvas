@@ -56,8 +56,14 @@ const animateParticles = () => {
     }
     //如果<180并且大于120，则吸引
     if (distance < attrtchDistance && distance > connectionDistance) {
-      particle.x += (mouseX - particle.x) * 0.02;
-      particle.y += (mouseY - particle.y) * 0.02;
+      if (distance < connectionDistance.value + 10) {
+        particle.x += (mouseX - particle.x) * 0.002
+        particle.y += (mouseY - particle.y) * 0.002
+      }
+      else {
+        particle.x += (mouseX - particle.x) * 0.02;
+        particle.y += (mouseY - particle.y) * 0.02;
+      }
     }else{
       particle.x += particle.dx;
       particle.y += particle.dy;
