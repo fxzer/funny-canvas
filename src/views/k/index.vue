@@ -16,6 +16,9 @@ const audioGroup3 = [audio7, audio8]
 const ctx = ref(null);
 let fireworks = [];
 
+function randNumber(min, max) {
+  return Math.random() * (max - min) + min;
+}
 class Particle {
   randColor() {
     return `rgb(${parseInt(Math.random() * 255)}, ${parseInt(Math.random() * 255)}, ${parseInt(Math.random() * 255)})`;
@@ -25,7 +28,6 @@ class Particle {
     this.y = y;
     this.vx = 0;
     this.vy = 0;
-
     this.color = this.randColor();
   }
 
@@ -47,7 +49,8 @@ class Particle {
 class Explosion {
   constructor(x, y) {
     this.particles = new Array();
-    for (var i = 0; i < 70; i++) {
+    let count = randNumber(50, 100);
+    for (var i = 0; i < count; i++) {
       var vx = Math.sin(i / 30 * Math.PI * 2);
       var vy = Math.cos(i / 30 * Math.PI * 2);
       var particle = new Particle(x, y);
@@ -73,7 +76,7 @@ class Explosion {
 }
 
 class Firework {
-  constructor(x, y, vx, vy) {
+  constructor(x, y, vx, vy,delay) {
     this.x = x;
     this.y = y;
     this.vx = vx;
@@ -82,6 +85,7 @@ class Firework {
     this.source = new Particle(x, y);
     this.source.vx = vx;
     this.source.vy = vy;
+    this.delay = delay; // 添加延迟时间属性
   }
 
   update() {
@@ -116,29 +120,30 @@ const initCanvas = () => {
 const initFirework = () => {
   let w = canvas.value.width;
   let h = canvas.value.height;
-  fireworks = [
-    new Firework(w * Math.random(), h, 0, -10),
-    new Firework(w * Math.random(), h, 0, -10),
-    new Firework(w * Math.random(), h, 0, -10),
-    new Firework(w * Math.random(), h, 0, -10),
-  ]
+  fireworks = Array.from({length:10}).map(() => {
+    return new Firework(w * Math.random(), randNumber(h/2,h), 0, -10, randNumber(100, 1000))
+  })
 }
 const amimate = () => {
   ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height);
   fireworks.forEach(async function (firework) {
-    firework.update();
-    firework.draw(ctx.value);
-    if (firework.blown && !firework.playSound) {
-      await audioGroup1[parseInt(Math.random() * 3)].value.play()
-      await audioGroup2[parseInt(Math.random() * 3)].value.play()
-      await audioGroup3[parseInt(Math.random() * 2)].value.play();
-      firework.playSound = true;
+    if (firework.delay <= 0) { // 延迟时间已过
+      firework.update();
+      firework.draw(ctx.value);
+      if (firework.blown && !firework.playSound) {
+        await audioGroup1[parseInt(Math.random() * 3)].value.play()
+        await audioGroup2[parseInt(Math.random() * 3)].value.play()
+        await audioGroup3[parseInt(Math.random() * 2)].value.play();
+        firework.playSound = true;
+      }
+    } else {
+      firework.delay -= 16; // 每帧减少16毫秒
     }
   })
   requestAnimationFrame(amimate)
 }
 const showPlayBtn = ref(true)
-const playHandler =  () => {
+const playHandler = () => {
   amimate()
   setTimeout(() => {
     showPlayBtn.value = false
@@ -159,7 +164,9 @@ onUnmounted(() => {
 <template>
   <div class="relative">
     <canvas ref='canvas'></canvas>
-    <Play class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 cursor-pointer text-sky-200 dark:text-gray-500" @click="playHandler"  v-if="showPlayBtn"></Play>
+    <Play
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 cursor-pointer text-sky-200 dark:text-gray-500"
+      @click="playHandler" v-if="showPlayBtn"></Play>
     <audio ref="audio1" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift1.mp3"></audio>
     <audio ref="audio2" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift2.mp3"></audio>
     <audio ref="audio3" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift3.mp3"></audio>
