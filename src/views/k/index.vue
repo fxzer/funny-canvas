@@ -18,24 +18,12 @@ const ctx = ref(null)
 let fireworks = []
 
 function randNumber(min, max) {
-<<<<<<< HEAD
-  return Math.random() * (max - min) + min;
-=======
   return Math.random() * (max - min) + min
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
 }
 class Particle {
   randColor() {
     return `rgb(${Number.parseInt(Math.random() * 255)}, ${Number.parseInt(Math.random() * 255)}, ${Number.parseInt(Math.random() * 255)})`
   }
-<<<<<<< HEAD
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.vx = 0;
-    this.vy = 0;
-    this.color = this.randColor();
-=======
 
   constructor(x, y) {
     this.x = x
@@ -43,7 +31,6 @@ class Particle {
     this.vx = 0
     this.vy = 0
     this.color = this.randColor()
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
   }
 
   update() {
@@ -64,17 +51,6 @@ class Particle {
 }
 class Explosion {
   constructor(x, y) {
-<<<<<<< HEAD
-    this.particles = new Array();
-    let count = randNumber(50, 100);
-    for (var i = 0; i < count; i++) {
-      var vx = Math.sin(i / 30 * Math.PI * 2);
-      var vy = Math.cos(i / 30 * Math.PI * 2);
-      var particle = new Particle(x, y);
-      var fuzziness = Math.random() * 5;
-      particle.vx = vx * fuzziness;
-      particle.vy = vy * fuzziness;
-=======
     this.particles = []
     const count = randNumber(50, 100)
     for (let i = 0; i < count; i++) {
@@ -84,7 +60,6 @@ class Explosion {
       const fuzziness = Math.random() * 5
       particle.vx = vx * fuzziness
       particle.vy = vy * fuzziness
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
 
       this.particles.push(particle)
     }
@@ -104,18 +79,6 @@ class Explosion {
 }
 
 class Firework {
-<<<<<<< HEAD
-  constructor(x, y, vx, vy,delay) {
-    this.x = x;
-    this.y = y;
-    this.vx = vx;
-    this.vy = vy;
-    this.blown = false;
-    this.source = new Particle(x, y);
-    this.source.vx = vx;
-    this.source.vy = vy;
-    this.delay = delay; // 添加延迟时间属性
-=======
   constructor(x, y, vx, vy, delay) {
     this.x = x
     this.y = y
@@ -126,7 +89,6 @@ class Firework {
     this.source.vx = vx
     this.source.vy = vy
     this.delay = delay // 添加延迟时间属性
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
   }
 
   update() {
@@ -157,29 +119,6 @@ function initCanvas() {
     ctx.value = canvas.value.getContext('2d')
   }
 }
-<<<<<<< HEAD
-const initFirework = () => {
-  let w = canvas.value.width;
-  let h = canvas.value.height;
-  fireworks = Array.from({length:10}).map(() => {
-    return new Firework(w * Math.random(), randNumber(h/2,h), 0, -10, randNumber(100, 1000))
-  })
-}
-const amimate = () => {
-  ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height);
-  fireworks.forEach(async function (firework) {
-    if (firework.delay <= 0) { // 延迟时间已过
-      firework.update();
-      firework.draw(ctx.value);
-      if (firework.blown && !firework.playSound) {
-        await audioGroup1[parseInt(Math.random() * 3)].value.play()
-        await audioGroup2[parseInt(Math.random() * 3)].value.play()
-        await audioGroup3[parseInt(Math.random() * 2)].value.play();
-        firework.playSound = true;
-      }
-    } else {
-      firework.delay -= 16; // 每帧减少16毫秒
-=======
 function initFirework() {
   const w = canvas.value.width
   const h = canvas.value.height
@@ -202,17 +141,12 @@ function amimate() {
     }
     else {
       firework.delay -= 16 // 每帧减少16毫秒
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
     }
   })
   requestAnimationFrame(amimate)
 }
 const showPlayBtn = ref(true)
-<<<<<<< HEAD
-const playHandler = () => {
-=======
 function playHandler() {
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
   amimate()
   setTimeout(() => {
     showPlayBtn.value = false
@@ -228,27 +162,11 @@ onMounted(() => {
 </script>
 
 <template>
-<<<<<<< HEAD
   <div class="relative">
-    <canvas ref='canvas'></canvas>
-    <Play
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 cursor-pointer text-sky-200 dark:text-gray-500"
-      @click="playHandler" v-if="showPlayBtn"></Play>
-    <audio ref="audio1" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift1.mp3"></audio>
-    <audio ref="audio2" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift2.mp3"></audio>
-    <audio ref="audio3" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift3.mp3"></audio>
-    <audio ref="audio4" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/burst-sm-1.mp3"></audio>
-    <audio ref="audio5" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/burst-sm-2.mp3"></audio>
-    <audio ref="audio6" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/burst2.mp3"></audio>
-    <audio ref="audio7" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/crackle-sm-1.mp3"></audio>
-    <audio ref="audio8" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/crackle1.mp3"></audio>
-=======
-  <div class="relative wh-full">
     <canvas ref="canvas" />
     <Play
       v-if="showPlayBtn"
-      class="absolute play-btn top-1/2 left-1/2 wh-16  cursor-pointer text-gray-300 dark:text-gray-500 "
-      @click="playHandler"
+      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 cursor-pointer text-sky-200 dark:text-gray-500" @click="playHandler"
     />
     <audio ref="audio1" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift1.mp3" />
     <audio ref="audio2" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/lift2.mp3" />
@@ -258,7 +176,6 @@ onMounted(() => {
     <audio ref="audio6" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/burst2.mp3" />
     <audio ref="audio7" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/crackle-sm-1.mp3" />
     <audio ref="audio8" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/329180/crackle1.mp3" />
->>>>>>> c6c4652 (fix: 修复烟花同时播放问题)
   </div>
 </template>
 
