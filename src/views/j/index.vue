@@ -1,6 +1,6 @@
 <script setup>
 import { useDark, useDebounceFn } from '@vueuse/core'
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watchEffect } from 'vue'
 
 const wrap = ref(null)
 const canvas = ref(null)
@@ -13,12 +13,12 @@ const connectionOpacity = 0.2
 let mouseX = 0
 let mouseY = 0
 const isDark = useDark()
-let color = isDark.value ? '#fff' : '#000'
-let rgbaPre = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
+const particleColor = ref(isDark.value ? '#fff' : '#000')
+const lineColor = ref(isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,')
 const debounceResize = useDebounceFn(resizeHandler, 500)
-watch(isDark, () => {
-  color = isDark.value ? '#fff' : '#000'
-  rgbaPre = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
+watchEffect(() => {
+  particleColor.value = isDark.value ? '#fff' : '#000'
+  lineColor.value = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
 })
 
 function resizeHandler() {
@@ -26,12 +26,16 @@ function resizeHandler() {
   createParticles()
 }
 function initializeCanvas() {
+  if (!canvas.value || !wrap.value)
+    return
   const { width, height } = wrap.value.getBoundingClientRect()
   canvas.value.width = width
   canvas.value.height = height
 }
 
 function createParticles() {
+  if (!canvas.value)
+    return
   particles.value = []
   for (let i = 0; i < 100; i++) {
     const particle = {
@@ -45,6 +49,8 @@ function createParticles() {
 }
 
 function animateParticles() {
+  if (!ctx.value || !canvas.value)
+    return
   ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height)
   particles.value.forEach((particle) => {
     const distance = Math.sqrt(
@@ -56,7 +62,7 @@ function animateParticles() {
       ctx.value.beginPath()
       ctx.value.moveTo(particle.x, particle.y)
       ctx.value.lineTo(mouseX, mouseY)
-      ctx.value.strokeStyle = `${rgbaPre}${opacity * connectionOpacity})`
+      ctx.value.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
       ctx.value.stroke()
       ctx.value.closePath()
     }
@@ -84,7 +90,7 @@ function animateParticles() {
 
     ctx.value.beginPath()
     ctx.value.arc(particle.x, particle.y, particleRadius, 0, Math.PI * 2)
-    ctx.value.fillStyle = color
+    ctx.value.fillStyle = `${particleColor.value}`
     ctx.value.fill()
     ctx.value.closePath()
 
@@ -100,7 +106,7 @@ function animateParticles() {
           ctx.value.beginPath()
           ctx.value.moveTo(particle.x, particle.y)
           ctx.value.lineTo(otherParticle.x, otherParticle.y)
-          ctx.value.strokeStyle = `${rgbaPre}${opacity * connectionOpacity})`
+          ctx.value.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
           ctx.value.stroke()
           ctx.value.closePath()
         }
@@ -130,11 +136,13 @@ onMounted(() => {
   canvas.value.addEventListener('mouseleave', handleMouseLeave)
 })
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   cancelAnimationFrame(animateParticles)
-  canvas.value.removeEventListener('mouseleave', handleMouseLeave)
-  canvas.value?.removeEventListener('mousemove', handleMouseMove)
-  canvas.value.removeEventListener('mouseleave', handleMouseLeave)
+  if (canvas.value) {
+    canvas.value.removeEventListener('mouseleave', handleMouseLeave)
+    canvas.value?.removeEventListener('mousemove', handleMouseMove)
+    canvas.value.removeEventListener('mouseleave', handleMouseLeave)
+  }
 })
 </script>
 

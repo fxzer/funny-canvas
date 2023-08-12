@@ -24,6 +24,8 @@ function initCanvas() {
 function initAudio() {
   atx.value = new AudioContext() // 创建一个音频上下文
   const source = atx.value.createMediaElementSource(audioA?.value as HTMLAudioElement)
+  // 初始音量
+  audioA.value!.volume = 0.2
   analyser.value = atx.value.createAnalyser() // 创建一个分析器
   source.connect(analyser.value) // 将音频源连接到分析器
   analyser.value.connect(atx.value.destination) // 将分析器连接到音频输出
@@ -103,7 +105,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="b h-full relative bg-white/10  backdrop-blur">
+  <div class="h-full relative bg-white/10  backdrop-blur">
     <canvas ref="canvasH" />
     <input id="upload" ref="audioFile" type="file" class=" hidden " @change="handleAudioFileChange">
     <div
@@ -120,5 +122,3 @@ onMounted(() => {
     </audio>
   </div>
 </template>
-
-<style scoped lang="scss"></style>

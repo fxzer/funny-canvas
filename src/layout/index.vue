@@ -12,7 +12,7 @@ const navs: Nav[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 
   return {
     id: index,
     label: letter,
-    hover: false,
+    ishover: false,
     src: imgs[letter],
   }
 })

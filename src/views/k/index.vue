@@ -120,6 +120,8 @@ function initCanvas() {
   }
 }
 function initFirework() {
+  if (!canvas.value)
+    return
   const w = canvas.value.width
   const h = canvas.value.height
   fireworks = Array.from({ length: 10 }).map(() => {

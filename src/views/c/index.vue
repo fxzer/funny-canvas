@@ -115,6 +115,8 @@ function initCanvas() {
 
 // 动画
 function animate() {
+  if (!ctx.value || !canvasC.value)
+    return
   ctx.value?.clearRect(0, 0, canvasC.value!.width, canvasC.value!.height)
   for (let i = 0; i < particlesArray.length; i++) {
     particlesArray[i].draw()

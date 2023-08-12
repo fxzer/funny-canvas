@@ -2,7 +2,7 @@ type Nav =  {
   label:string,
   id:number,
   src:string,
-  hover:boolean
+  ishover:boolean
 }
 
 type Img = {
