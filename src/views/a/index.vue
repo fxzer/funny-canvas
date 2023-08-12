@@ -1,25 +1,23 @@
-<template>
-  <canvas ref='canvasA'  class="backdrop-blur"></canvas>
-</template>
 <script setup lang='ts'>
-import { ref, reactive, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { useFps } from '@vueuse/core'
+
+const fps = useFps()
 const canvasA = ref<HTMLCanvasElement>()
-let requestAnimationId = 0;
-let ctx = ref<CanvasRenderingContext2D | null>(null);
+let requestAnimationId = 0
+const ctx = ref<CanvasRenderingContext2D | null>(null)
 const canvas = reactive({
   w: 0,
   h: 0,
-  fps: 0
 })
 const template = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()'
 const templateArr = template.split('')
 const fontSize = 16
 const fontStyle = `${fontSize}px Arial`
 const drops: number[] = []
-let lastTime = performance.now()
 
-const draw = () => {
-  calcFPS()
+function draw() {
+  showFPS()
   ctx.value!.fillStyle = 'rgba(0,0,0,0.05)'
   ctx.value!.fillRect(0, 0, canvas.w, canvas.h)
   ctx.value!.fillStyle = '#0F0'
@@ -27,47 +25,47 @@ const draw = () => {
   for (let i = 0; i < drops.length; i++) {
     const text = templateArr[Math.floor(Math.random() * templateArr.length)]
     ctx.value?.fillText(text, i * fontSize, drops[i] * fontSize)
-    if (drops[i] * fontSize > canvas.h && Math.random() > 0.95) {
+    if (drops[i] * fontSize > canvas.h && Math.random() > 0.95)
       drops[i] = 0
-    }
+
     drops[i] += 1
   }
 }
-const initCanvas = () => {
+function initCanvas() {
   if (canvasA.value) {
-    canvas.w = canvasA.value.width = window.innerWidth || 600;
-    canvas.h = canvasA.value.height = window.innerHeight || 600;
-    ctx.value = canvasA.value?.getContext('2d') as CanvasRenderingContext2D;   //获取canvas的上下文
-    let columns  = Math.floor(canvas.w / fontSize)
-    for (let i = 0; i < columns ; i++) {
+    canvas.w = canvasA.value.width = window.innerWidth || 600
+    canvas.h = canvasA.value.height = window.innerHeight || 600
+    ctx.value = canvasA.value?.getContext('2d') as CanvasRenderingContext2D // 获取canvas的上下文
+    const columns = Math.floor(canvas.w / fontSize)
+    for (let i = 0; i < columns; i++)
       drops[i] = 1
-    }
+
     amimate()
   }
 }
-const amimate = () => {
+function amimate() {
   requestAnimationId = window.requestAnimationFrame(amimate)
   draw()
 }
-//计算屏幕刷新率
-const calcFPS = () => {
-  const now = performance.now()
-  const deltaTime = now - lastTime
-  lastTime = now
-  canvas.fps = Math.round(1000 / deltaTime)
-    //给文字添加背景
- ctx.value!.fillStyle = 'rgba(0,0,0,1)'
+// 显示屏幕刷新率
+function showFPS() {
+  ctx.value!.fillStyle = 'rgba(0,0,0,1)'
   ctx.value!.fillRect(0, 0, 60, 20)
-  //填充文字到左上角
+  // 填充文字到左上角
   ctx.value!.fillStyle = '#FFF'
   ctx.value!.font = '16px Sans-serif'
-  ctx.value!.fillText(`FPS:${canvas.fps}`, 10, 20)
+  ctx.value!.fillText(`FPS:${fps.value}`, 10, 20)
 }
 onMounted(() => {
-  initCanvas();
+  initCanvas()
 })
 onUnmounted(() => {
   window.cancelAnimationFrame(requestAnimationId)
 })
 </script>
+
+<template>
+  <canvas ref="canvasA" class="backdrop-blur" />
+</template>
+
 <style scoped lang='scss'></style>

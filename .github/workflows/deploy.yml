@@ -10,13 +10,13 @@ on:
 # 任务
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest #部署运行环境搭建
+    runs-on: ubuntu-latest # 部署运行环境搭建
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@main
         with:
           persist-credentials: false
-          fetch-depth: 0 #github代码拉取深度
+          fetch-depth: 0 # github代码拉取深度
 
       - name: Install Node.js
         uses: actions/setup-node@v3

@@ -1,16 +1,18 @@
 <template>
-  <svg t="1683351192256" class="icon cursor-pointer " viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2538"
-    width="50" height="50"  >
+  <svg
+    t="1683351192256"
+    class=" p-2 absolute text-xl top-1/2 cursor-pointer rounded-md text-zinc-400
+    hover:(text-zinc-800 bg-zinc-600/10 font-bold) dark:text-zinc-600 dark:hover:(text-zinc-200 bg-zinc-600/40) z-100"
+    viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2538"
+    width="50" height="50"
+  >
     <path
       d="M758.982626 520.67252c-5.938246 0-11.876492-2.272763-16.422018-6.817266L277.710464 49.005111c-9.090029-9.089006-9.090029-23.814382 0-32.904411 9.089006-9.090029 23.814382-9.090029 32.904411 0l464.850144 464.850144c9.090029 9.090029 9.090029 23.815405 0 32.905434C770.920516 518.40078 764.951571 520.67252 758.982626 520.67252z"
-      fill="currentColor" p-id="2539"></path>
+      fill="currentColor" p-id="2539"
+    />
     <path
       d="M265.106402 1014.594793c-5.953595 0-11.908214-2.302439-16.452717-6.846942-9.090029-9.090029-9.090029-23.814382 0-32.904411l493.907946-493.892597c9.090029-9.090029 23.814382-9.090029 32.904411 0s9.090029 23.815405 0 32.905434L281.558096 1007.747851C277.013593 1012.292354 271.058974 1014.594793 265.106402 1014.594793z"
-      fill="currentColor" p-id="2540"></path>
+      fill="currentColor" p-id="2540"
+    />
   </svg>
 </template>
-<script setup lang='ts'>
-
-</script>
-<style scoped lang='scss'>
-</style>

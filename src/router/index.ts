@@ -8,7 +8,7 @@ const routes = [
     redirect: '/a',
 
   },
-  ...canvasRoutes
+  ...canvasRoutes,
 ]
 const router = createRouter({
   history: createWebHashHistory(),

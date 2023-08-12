@@ -19,6 +19,6 @@ export default {
   g: G,
   h: H,
   i: I,
-  k: K
+  k: K,
 
 } as Img
