@@ -1,7 +1,10 @@
+<script setup lang='ts'>
+</script>
+
 <template>
-  <div class="o">
-    <h1 class="text-3xl">
-      o works !!!
-    </h1>
-  </div>
+  o
 </template>
+
+<style scoped lang='scss'>
+
+</style>

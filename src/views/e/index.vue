@@ -1,6 +1,5 @@
 <script  lang="ts" setup>
 import * as THREE from 'three'
-import { defineProps, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const props = defineProps({
   // 控制x轴波浪的长度

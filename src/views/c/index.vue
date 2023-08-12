@@ -1,16 +1,9 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
-import useMouse from '@/hooks/useMouse'
-
-const canvasC = ref<HTMLCanvasElement>()
-const ctx = ref<CanvasRenderingContext2D | null>(null)
 const { x, y } = useMouse()
+const { canvasRef, context, width, height } = useCanvas()
+
 let particlesArray: Particle[] = []
-const mouse = {
-  x,
-  y,
-  radius: 200,
-}
+const mouseRadius = 200
 /* 自定义例子颜色，数量，密度 */
 class Particle { // 粒子
   x: number
@@ -30,27 +23,27 @@ class Particle { // 粒子
   }
 
   draw() {
-    ctx.value?.beginPath()
-    ctx.value!.fillStyle = 'green'
-    ctx.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-    ctx.value?.closePath()
-    ctx.value?.fill()
+    context.value?.beginPath()
+    context.value!.fillStyle = 'green'
+    context.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+    context.value?.closePath()
+    context.value?.fill()
   }
 
   update() {
-    const dx = mouse.x.value - this.x
-    const dy = mouse.y.value - this.y
+    const dx = x.value - this.x
+    const dy = y.value - this.y
     const distance = Math.sqrt(dx * dx + dy * dy) // 粒子与鼠标的距离
 
     // 计算力度
     const forceDirectionX = dx / distance
     const forceDirectionY = dy / distance
 
-    const maxDistance = mouse.radius
+    const maxDistance = mouseRadius
     const force = (maxDistance - distance) / maxDistance
     const directionX = forceDirectionX * force * this.density
     const directionY = forceDirectionY * force * this.density
-    if (distance < mouse.radius) { // 在鼠标半径范围内的粒子
+    if (distance < mouseRadius) { // 在鼠标半径范围内的粒子
       this.x -= directionX
       this.y -= directionY
     }
@@ -69,14 +62,12 @@ class Particle { // 粒子
 }
 function fillText() {
   /* 文字粒子 */
-  const cw = canvasC.value!.width
-  const ch = canvasC.value!.height
   particlesArray = []
   const fontSize = 240
   const text = 'ABC'
-  ctx.value!.font = `${fontSize}px Verdana` // 字体大小
-  ctx.value?.fillText(text, 0, fontSize - (0.2 * fontSize), cw) // 让文字初始化在 canvas 最左上角
-  const textCoordinates = ctx.value?.getImageData(0, 0, cw, ch)
+  context.value!.font = `${fontSize}px Verdana` // 字体大小
+  context.value?.fillText(text, 0, fontSize - (0.2 * fontSize), width.value) // 让文字初始化在 canvas 最左上角
+  const textCoordinates = context.value?.getImageData(0, 0, width.value, height.value)
   const { width: w = 0, height: h = 0, data = [] } = textCoordinates || {}
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
@@ -91,33 +82,24 @@ function fillText() {
 function calculateOffset(x: number, y: number, fs: number, text: string) {
   const len = text.length
   const tw = fs * len
-  const px = x + canvasC.value!.width / 2 - tw * 0.8 / 2
-  const py = y + canvasC.value!.height / 2 - fs / 2
+  const px = x + width.value / 2 - tw * 0.8 / 2
+  const py = y + height.value / 2 - fs / 2
   return { px, py }
 }
-function initCanvas() {
-  if (canvasC.value) {
-    canvasC.value.width = window.innerWidth || 600
-    canvasC.value.height = window.innerHeight || 600
-    ctx.value = canvasC.value?.getContext('2d') as CanvasRenderingContext2D // 获取canvas的上下文
-    fillText()
-    // randomParticle()
-  }
-}
-// const randomParticle = () => {
-//    for (let i = 0; i < 100; i++) {
-//       const x = Math.floor(Math.random() * canvasC.value!.width);
-//       const y = Math.floor(Math.random() * canvasC.value!.height);
-//       let particle = new Particle(x, y);
-//       particlesArray.push(particle);
-//    }
+// function randomParticle() {
+//   for (let i = 0; i < 100; i++) {
+//     const x = Math.floor(Math.random() * width.value)
+//     const y = Math.floor(Math.random() * height.value)
+//     const particle = new Particle(x, y)
+//     particlesArray.push(particle)
+//   }
 // }
 
 // 动画
 function animate() {
-  if (!ctx.value || !canvasC.value)
+  if (!context.value || !canvasRef.value)
     return
-  ctx.value?.clearRect(0, 0, canvasC.value!.width, canvasC.value!.height)
+  context.value?.clearRect(0, 0, width.value, height.value)
   for (let i = 0; i < particlesArray.length; i++) {
     particlesArray[i].draw()
     particlesArray[i].update()
@@ -126,11 +108,12 @@ function animate() {
 }
 
 onMounted(() => {
-  initCanvas()
+  fillText()
+  // randomParticle()
   animate()
 })
 </script>
 
 <template>
-  <canvas ref="canvasC" />
+  <canvas ref="canvasRef" />
 </template>

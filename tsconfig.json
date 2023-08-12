@@ -24,6 +24,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/canvas-routes.ts","colorthief.d.ts"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/canvas-routes.ts","colorthief.d.ts", "auto-imports.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

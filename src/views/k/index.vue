@@ -1,8 +1,7 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import Play from '@/components/Play.vue'
 
-const canvas = ref()
+const { canvasRef, context, width, height } = useCanvas()
 const audio1 = ref()
 const audio2 = ref()
 const audio3 = ref()
@@ -14,7 +13,6 @@ const audio8 = ref()
 const audioGroup1 = [audio1, audio2, audio3]
 const audioGroup2 = [audio4, audio5, audio6]
 const audioGroup3 = [audio7, audio8]
-const ctx = ref(null)
 let fireworks = []
 
 function randNumber(min, max) {
@@ -40,7 +38,7 @@ class Particle {
   }
 
   draw(context) {
-    if (this.x < 0 || this.y < 0 || this.x > canvas.value.width || this.y > canvas.value.height)
+    if (this.x < 0 || this.y < 0 || this.x > width.value || this.y > height.value)
       return
 
     context.fillStyle = this.color
@@ -71,9 +69,9 @@ class Explosion {
     })
   }
 
-  draw(ctx) {
+  draw(context) {
     this.particles.forEach((par) => {
-      par.draw(ctx)
+      par.draw(context)
     })
   }
 }
@@ -103,37 +101,26 @@ class Firework {
       this.explosion.update()
   }
 
-  draw(ctx) {
+  draw(context) {
     if (this.blown)
-      this.explosion.draw(ctx)
+      this.explosion.draw(context)
 
     else
-      this.source.draw(ctx)
+      this.source.draw(context)
   }
 }
 
-function initCanvas() {
-  if (canvas.value) {
-    canvas.value.width = window.innerWidth || 600
-    canvas.value.height = window.innerHeight || 600
-    ctx.value = canvas.value.getContext('2d')
-  }
-}
 function initFirework() {
-  if (!canvas.value)
-    return
-  const w = canvas.value.width
-  const h = canvas.value.height
   fireworks = Array.from({ length: 10 }).map(() => {
-    return new Firework(w * Math.random(), randNumber(h / 2, h), 0, -10, randNumber(100, 1000))
+    return new Firework(width.value * Math.random(), randNumber(height.value / 2, height.value), 0, -10, randNumber(100, 1000))
   })
 }
 function amimate() {
-  ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  context.value.clearRect(0, 0, width.value, height.value)
   fireworks.forEach(async (firework) => {
     if (firework.delay <= 0) { // 延迟时间已过
       firework.update()
-      firework.draw(ctx.value)
+      firework.draw(context.value)
       if (firework.blown && !firework.playSound) {
         await audioGroup1[Number.parseInt(Math.random() * 3)].value.play()
         await audioGroup2[Number.parseInt(Math.random() * 3)].value.play()
@@ -155,7 +142,6 @@ function playHandler() {
   }, 100)
 }
 onMounted(() => {
-  initCanvas()
   initFirework()
   setInterval(() => {
     initFirework()
@@ -165,7 +151,7 @@ onMounted(() => {
 
 <template>
   <div class="relative">
-    <canvas ref="canvas" />
+    <canvas ref="canvasRef" />
     <Play
       v-if="showPlayBtn"
       class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 cursor-pointer text-sky-200 dark:text-gray-500" @click="playHandler"

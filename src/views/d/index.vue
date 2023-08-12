@@ -1,19 +1,10 @@
 <script lang="ts" setup>
-import { onMounted, ref, watchEffect } from 'vue'
-import { useDark } from '@vueuse/core'
-import useMouse from '@/hooks/useMouse'
-
 const isDark = useDark()
-
-const canvasC = ref<HTMLCanvasElement>()
-const ctx = ref<CanvasRenderingContext2D | null>(null)
 const { x, y } = useMouse()
+const { canvasRef, context, width, height } = useCanvas()
+
+const mouseRadius = 200
 let particlesArray: Particle[] = []
-const mouse = {
-  x,
-  y,
-  radius: 200,
-}
 /* 自定义例子颜色，数量，密度 */
 class Particle { // 粒子
   x: number
@@ -33,27 +24,27 @@ class Particle { // 粒子
   }
 
   draw() {
-    ctx.value?.beginPath()
-    ctx.value!.fillStyle = 'green'
-    ctx.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-    ctx.value?.closePath()
-    ctx.value?.fill()
+    context.value?.beginPath()
+    context.value!.fillStyle = 'green'
+    context.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+    context.value?.closePath()
+    context.value?.fill()
   }
 
   update() {
-    const dx = mouse.x.value - this.x
-    const dy = mouse.y.value - this.y
+    const dx = x.value - this.x
+    const dy = y.value - this.y
     const distance = Math.sqrt(dx * dx + dy * dy) // 粒子与鼠标的距离
 
     // 计算力度
     const forceDirectionX = dx / distance
     const forceDirectionY = dy / distance
 
-    const maxDistance = mouse.radius
+    const maxDistance = mouseRadius
     const force = (maxDistance - distance) / maxDistance
     const directionX = forceDirectionX * force * this.density
     const directionY = forceDirectionY * force * this.density
-    if (distance < mouse.radius) { // 在鼠标半径范围内的粒子
+    if (distance < mouseRadius) { // 在鼠标半径范围内的粒子
       this.x -= directionX
       this.y -= directionY
     }
@@ -72,30 +63,20 @@ class Particle { // 粒子
 }
 function fillText() {
   /* 文字粒子 */
-  const cw = canvasC.value!.width
-  const ch = canvasC.value!.height
   particlesArray = []
   const fontSize = 40
   const text = 'ABC'
-  const adjustX = Math.floor((cw - ctx.value!.measureText('A').width) / 3.5) - 400
-  const adjustY = Math.floor((ch - fontSize * 10) / 4)
-  ctx.value!.font = `${fontSize}px Verdana` // 字体大小
-  ctx.value?.fillText(text, 0, fontSize - (0.2 * fontSize), cw) // 让文字初始化在 canvas 最左上角
-  const textCoordinates = ctx.value?.getImageData(0, 0, cw, ch)
+  const adjustX = Math.floor((width.value - context.value!.measureText('A').width) / 3.5) - 400
+  const adjustY = Math.floor((height.value - fontSize * 10) / 4)
+  context.value!.font = `${fontSize}px Verdana` // 字体大小
+  context.value?.fillText(text, 0, fontSize - (0.2 * fontSize), width.value) // 让文字初始化在 canvas 最左上角
+  const textCoordinates = context.value?.getImageData(0, 0, width.value, height.value)
   const { width: w = 0, height: h = 0, data = [] } = textCoordinates || {}
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       if (data[(y * 4 * w) + (x * 4) + 3] > 128)
         particlesArray.push(new Particle(x * 20 + adjustX, y * 20 + adjustY))
     }
-  }
-}
-function initCanvas() {
-  if (canvasC.value) {
-    canvasC.value.width = window.innerWidth || 600
-    canvasC.value.height = window.innerHeight || 600
-    ctx.value = canvasC.value?.getContext('2d') as CanvasRenderingContext2D // 获取canvas的上下文
-    fillText()
   }
 }
 
@@ -112,21 +93,21 @@ function connect() {
       const maxDistance = 30
       if (distance < maxDistance) {
         opacity = Number.parseFloat((1 - (distance / maxDistance)).toFixed(2))
-        ctx.value!.strokeStyle = `${strokePre.value}${opacity})`
-        ctx.value?.beginPath()
-        ctx.value!.lineWidth = 1.8
-        ctx.value?.moveTo(particlesArray[a].x, particlesArray[a].y)
-        ctx.value?.lineTo(particlesArray[b].x, particlesArray[b].y)
-        ctx.value?.stroke()
+        context.value!.strokeStyle = `${strokePre.value}${opacity})`
+        context.value?.beginPath()
+        context.value!.lineWidth = 1.8
+        context.value?.moveTo(particlesArray[a].x, particlesArray[a].y)
+        context.value?.lineTo(particlesArray[b].x, particlesArray[b].y)
+        context.value?.stroke()
       }
     }
   }
 }
 // 动画
 function animate() {
-  if (!ctx.value || !canvasC.value)
+  if (!context.value || !canvasRef.value)
     return
-  ctx.value?.clearRect(0, 0, canvasC.value!.width, canvasC.value!.height)
+  context.value?.clearRect(0, 0, width.value, height.value)
   for (let i = 0; i < particlesArray.length; i++) {
     particlesArray[i].draw()
     particlesArray[i].update()
@@ -139,11 +120,11 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-  initCanvas()
+  fillText()
   animate()
 })
 </script>
 
 <template>
-  <canvas ref="canvasC" />
+  <canvas ref="canvasRef" />
 </template>

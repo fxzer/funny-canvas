@@ -1,26 +1,13 @@
 <script setup lang='ts'>
-import { onMounted, ref } from 'vue'
-
-const canvasH = ref<HTMLCanvasElement>()
+const { canvasRef, context, width, height } = useCanvas()
 const audioA = ref<HTMLAudioElement>()
 const audioFile = ref<HTMLInputElement>()
-const ctx = ref<CanvasRenderingContext2D | null>(null)
 const atx = ref<AudioContext | null>(null)
 const analyser = ref<AnalyserNode | null>(null)
 let dataArray: any = []
-const w = ref(0)
-const h = ref(0)
 const musicName = ref('The theme of Bangaichi.mp3')
 const requestAnimationFrameId = ref(0)
 const loading = ref(false)
-// 初始化
-function initCanvas() {
-  if (canvasH.value) {
-    w.value = canvasH.value.width = window.innerWidth || 600
-    h.value = canvasH.value.height = window.innerHeight || 600
-    ctx.value = canvasH.value?.getContext('2d') as CanvasRenderingContext2D // 获取canvas的上下文
-  }
-}
 function initAudio() {
   atx.value = new AudioContext() // 创建一个音频上下文
   const source = atx.value.createMediaElementSource(audioA?.value as HTMLAudioElement)
@@ -68,28 +55,28 @@ function handleAudioFileChange(e: any) {
 }
 
 function draw() {
-  if (ctx.value) {
-    ctx.value.clearRect(0, 0, w.value, h.value)
+  if (context.value) {
+    context.value.clearRect(0, 0, width.value, height.value)
     if (analyser.value) {
       analyser.value.getByteFrequencyData(dataArray) // 将当前分析后的音频数据存入数组
       const dataLen = dataArray.length / 3
-      const barWidth = w.value / dataLen / 2
+      const barWidth = width.value / dataLen / 2
       for (let i = 0; i < dataLen; i++) {
         const value = dataArray[i]
         const percent = value / 256
-        const barHeight = h.value * percent
+        const barHeight = height.value * percent
         /* 左右对称 */
         // 左边
-        const x1 = i * barWidth + w.value / 2
+        const x1 = i * barWidth + width.value / 2
         // 右边
-        const x2 = w.value / 2 - (i + 1) * barWidth
+        const x2 = width.value / 2 - (i + 1) * barWidth
 
-        const y = h.value - barHeight
+        const y = height.value - barHeight
         const hue = i / dataLen * 360
 
-        ctx.value.fillStyle = `hsl(${hue}, 100%, 50%)`
-        ctx.value.fillRect(x1, y, barWidth - 2, barHeight)
-        ctx.value.fillRect(x2, y, barWidth - 2, barHeight)
+        context.value.fillStyle = `hsl(${hue}, 100%, 50%)`
+        context.value.fillRect(x1, y, barWidth - 2, barHeight)
+        context.value.fillRect(x2, y, barWidth - 2, barHeight)
       }
     }
   }
@@ -98,15 +85,13 @@ function draw() {
   requestAnimationFrameId.value = requestAnimationFrame(draw)
 }
 onMounted(() => {
-  initCanvas()
   initAudio()
-  window.addEventListener('resize', initCanvas)
 })
 </script>
 
 <template>
   <div class="h-full relative bg-white/10  backdrop-blur">
-    <canvas ref="canvasH" />
+    <canvas ref="canvasRef" />
     <input id="upload" ref="audioFile" type="file" class=" hidden " @change="handleAudioFileChange">
     <div
       class="w-80 left-0 right-0 mx-auto z-50 bg-white/50  backdrop-blur absolute bottom-36 rounded-full overflow-hidden flex-y-center"

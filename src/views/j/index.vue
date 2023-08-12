@@ -1,80 +1,70 @@
-<script setup>
-import { useDark, useDebounceFn } from '@vueuse/core'
-import { onBeforeUnmount, onMounted, ref, watchEffect } from 'vue'
+<script setup lang="ts">
+const { x, y } = useMouse()
+const { canvasRef, context, width, height } = useCanvas()
 
-const wrap = ref(null)
-const canvas = ref(null)
-const ctx = ref(null)
-const particles = ref([])
+interface Particle {
+  x: number
+  y: number
+  dx: number
+  dy: number
+}
+const particles = ref<Particle[]>([])
 const particleRadius = 2
 const attrtchDistance = 180
 const connectionDistance = 120
 const connectionOpacity = 0.2
-let mouseX = 0
-let mouseY = 0
 const isDark = useDark()
 const particleColor = ref(isDark.value ? '#fff' : '#000')
 const lineColor = ref(isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,')
-const debounceResize = useDebounceFn(resizeHandler, 500)
+const debounceResize = useDebounceFn(createParticles, 500)
 watchEffect(() => {
   particleColor.value = isDark.value ? '#fff' : '#000'
   lineColor.value = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
 })
 
-function resizeHandler() {
-  initializeCanvas()
-  createParticles()
-}
-function initializeCanvas() {
-  if (!canvas.value || !wrap.value)
-    return
-  const { width, height } = wrap.value.getBoundingClientRect()
-  canvas.value.width = width
-  canvas.value.height = height
-}
-
 function createParticles() {
-  if (!canvas.value)
+  if (!canvasRef.value)
     return
   particles.value = []
   for (let i = 0; i < 100; i++) {
-    const particle = {
-      x: Math.random() * canvas.value.width,
-      y: Math.random() * canvas.value.height,
+    const particle: Particle = {
+      x: Math.random() * width.value,
+      y: Math.random() * height.value,
       dx: Math.random() * 2 - 1,
       dy: Math.random() * 2 - 1,
     }
     particles.value.push(particle)
   }
 }
+const requestAnimationId = ref(0)
 
 function animateParticles() {
-  if (!ctx.value || !canvas.value)
+  if (!context.value || !canvasRef.value)
     return
-  ctx.value.clearRect(0, 0, canvas.value.width, canvas.value.height)
+  context.value.clearRect(0, 0, width.value, height.value)
   particles.value.forEach((particle) => {
     const distance = Math.sqrt(
-      (particle.x - mouseX) ** 2
-      + (particle.y - mouseY) ** 2,
+      (particle.x - x.value) ** 2
+      + (particle.y - y.value) ** 2,
     )
     if (distance < attrtchDistance) {
       const opacity = 1 - distance / attrtchDistance
-      ctx.value.beginPath()
-      ctx.value.moveTo(particle.x, particle.y)
-      ctx.value.lineTo(mouseX, mouseY)
-      ctx.value.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
-      ctx.value.stroke()
-      ctx.value.closePath()
+      context.value?.beginPath()
+      context.value?.moveTo(particle.x, particle.y)
+      context.value?.lineTo(x.value, y.value)
+      context.value!.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
+      context.value?.stroke()
+      context.value?.closePath()
     }
     // 如果<180并且大于120，则吸引
-    if (mouseX && mouseY && distance < attrtchDistance && distance > connectionDistance) {
-      if (distance < connectionDistance.value + 10) {
-        particle.x += (mouseX - particle.x) * 0.002
-        particle.y += (mouseY - particle.y) * 0.002
+    if (x.value && y.value && distance < attrtchDistance && distance > connectionDistance) {
+      if (distance < connectionDistance + 10) {
+        particle.x += (x.value - particle.x) * 0.002
+        particle.y += (y.value - particle.y) * 0.002
       }
       else {
-        particle.x += (mouseX - particle.x) * 0.02
-        particle.y += (mouseY - particle.y) * 0.02
+        particle.x += (x.value - particle.x) * 0.02
+        particle.y += (y.value - particle.y) * 0.02
       }
     }
     else {
@@ -82,17 +72,17 @@ function animateParticles() {
       particle.y += particle.dy
     }
 
-    if (particle.x < particleRadius || particle.x > canvas.value.width - particleRadius)
+    if (particle.x < particleRadius || particle.x > width.value - particleRadius)
       particle.dx *= -1
 
-    if (particle.y < particleRadius || particle.y > canvas.value.height - particleRadius)
+    if (particle.y < particleRadius || particle.y > height.value - particleRadius)
       particle.dy *= -1
 
-    ctx.value.beginPath()
-    ctx.value.arc(particle.x, particle.y, particleRadius, 0, Math.PI * 2)
-    ctx.value.fillStyle = `${particleColor.value}`
-    ctx.value.fill()
-    ctx.value.closePath()
+    context.value?.beginPath()
+    context.value?.arc(particle.x, particle.y, particleRadius, 0, Math.PI * 2)
+    context.value!.fillStyle = `${particleColor.value}`
+    context.value?.fill()
+    context.value?.closePath()
 
     particles.value.forEach((otherParticle) => {
       if (particle !== otherParticle) {
@@ -103,51 +93,33 @@ function animateParticles() {
 
         if (dp < connectionDistance) {
           const opacity = 1 - dp / connectionDistance
-          ctx.value.beginPath()
-          ctx.value.moveTo(particle.x, particle.y)
-          ctx.value.lineTo(otherParticle.x, otherParticle.y)
-          ctx.value.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
-          ctx.value.stroke()
-          ctx.value.closePath()
+          context.value!.beginPath()
+          context.value!.moveTo(particle.x, particle.y)
+          context.value!.lineTo(otherParticle.x, otherParticle.y)
+          context.value!.strokeStyle = `${lineColor.value}${opacity * connectionOpacity})`
+          context.value!.stroke()
+          context.value!.closePath()
         }
       }
     })
   })
 
-  requestAnimationFrame(animateParticles)
+  requestAnimationId.value = requestAnimationFrame(animateParticles)
 }
 
-function handleMouseMove(event) {
-  const rect = wrap.value.getBoundingClientRect()
-  mouseX = event.clientX - rect.left
-  mouseY = event.clientY - rect.top
-}
-function handleMouseLeave() {
-  mouseX = 0
-  mouseY = 0
-}
 onMounted(() => {
-  ctx.value = canvas.value.getContext('2d')
-  initializeCanvas()
   createParticles()
   animateParticles()
   window.addEventListener('resize', debounceResize)
-  canvas.value.addEventListener('mousemove', handleMouseMove)
-  canvas.value.addEventListener('mouseleave', handleMouseLeave)
 })
 
 onBeforeUnmount(() => {
-  cancelAnimationFrame(animateParticles)
-  if (canvas.value) {
-    canvas.value.removeEventListener('mouseleave', handleMouseLeave)
-    canvas.value?.removeEventListener('mousemove', handleMouseMove)
-    canvas.value.removeEventListener('mouseleave', handleMouseLeave)
-  }
+  cancelAnimationFrame(requestAnimationId.value)
 })
 </script>
 
 <template>
-  <div ref="wrap" class="w-full h-full">
-    <canvas ref="canvas" />
-  </div>
+  <!-- <div ref="wrap" class="w-full h-full"> -->
+  <canvas ref="canvasRef" />
+  <!-- </div> -->
 </template>

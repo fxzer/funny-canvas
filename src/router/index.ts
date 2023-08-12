@@ -1,5 +1,4 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { useTitle } from '@vueuse/core'
 import canvasRoutes from './canvas-routes'
 
 const routes = [

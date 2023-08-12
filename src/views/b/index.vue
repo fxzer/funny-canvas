@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-
-const canvas = ref<HTMLCanvasElement>()
-const ctx = ref<CanvasRenderingContext2D | null>(null)
-const width = ref(0)
-const height = ref(0)
+const { canvasRef, context, width, height } = useCanvas()
 const animationRequestId = ref(0)
 const codeLines: string[] = [
   '                 _oo0oo_',
@@ -42,29 +37,21 @@ let row = 0
 let col = 1
 
 // 初始化画布
-function initCanvas() {
-  if (canvas.value) {
-    width.value = canvas.value.width = window.innerWidth || 600
-    height.value = canvas.value.height = window.innerHeight || 600
-    ctx.value = canvas.value.getContext('2d')
-    draw()
-  }
-}
 
 // 绘制代码
 function draw() {
-  if (ctx.value) {
-    ctx.value.clearRect(0, 0, width.value, height.value)
+  if (context.value) {
+    context.value.clearRect(0, 0, width.value, height.value)
     resume()
   }
   animationRequestId.value = requestAnimationFrame(draw)
 }
 // 执行代码
 function resume() {
-  ctx.value!.shadowColor = 'hsla(120,100%,50%,0.5)'
-  ctx.value!.shadowBlur = 2
-  ctx.value!.fillStyle = 'hsla(120,100%,20%,1)'
-  ctx.value!.globalCompositeOperation = 'lighter'
+  context.value!.shadowColor = 'hsla(120,100%,50%,0.5)'
+  context.value!.shadowBlur = 2
+  context.value!.fillStyle = 'hsla(120,100%,20%,1)'
+  context.value!.globalCompositeOperation = 'lighter'
   // 如果当前行是正在输入的那一行，只绘制到当前输入位置（col 列）。否则，绘制整行代码
   for (let i = 0; i <= row; i++) {
     let line = codeLines[i] || ''
@@ -72,16 +59,16 @@ function resume() {
       line = line.substring(0, col++)
 
     // 字体大小
-    ctx.value!.font = '16px monospace'
-    ctx.value!.fillText(line, 100, 100 + i * 16)
+    context.value!.font = '16px monospace'
+    context.value!.fillText(line, 100, 100 + i * 16)
   }
 
   // 绘制光标
-  ctx.value!.fillStyle = 'hsla(120,100%,50%,1)'
+  context.value!.fillStyle = 'hsla(120,100%,50%,1)'
   if (codeLines[row]) {
-    const x = 100 + ctx.value!.measureText(codeLines[row]?.substring(0, col)).width
+    const x = 100 + context.value!.measureText(codeLines[row]?.substring(0, col)).width
     const y = 100 + row * 16 - 14
-    ctx.value!.fillRect(x, y, 10, 14)
+    context.value!.fillRect(x, y, 10, 14)
   }
   if (col >= codeLines[row]?.length) { // 换行
     row++
@@ -89,14 +76,11 @@ function resume() {
   }
 
   if (row * 16 > window.innerHeight - 200)
-    ctx.value!.translate(0, -0.5) // 滚动
+    context.value!.translate(0, -0.5) // 滚动
 }
-onMounted(() => {
-  initCanvas()
-  window.addEventListener('resize', initCanvas)
-})
+onMounted(() => draw())
 </script>
 
 <template>
-  <canvas ref="canvas" class=" backdrop-blur" />
+  <canvas ref="canvasRef" class=" backdrop-blur" />
 </template>

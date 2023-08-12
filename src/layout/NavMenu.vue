@@ -1,7 +1,4 @@
 <script setup lang='ts'>
-import type { PropType } from 'vue'
-import { defineProps } from 'vue'
-import { useRoute } from 'vue-router'
 
 defineProps({
   navs: {

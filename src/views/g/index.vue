@@ -1,21 +1,13 @@
 <script setup lang='ts'>
-import { onMounted, reactive, ref } from 'vue'
+const { canvasRef, context, width, height } = useCanvas()
 
-const canvas = ref<HTMLCanvasElement>()
-
-const w = ref(0)
-const h = ref(0)
-const mouse = reactive({
-  x: 0,
-  y: 0,
-})
+const { x } = useMouse()
 const bar = {
   width: 20,
-  distance: 16,
+  distance: 20,
   speed: 8,
-  length: 400,
+  length: 500,
 }
-let ctx: CanvasRenderingContext2D | null = null
 let bars: Bar[] = []
 class Bar {
   x: number
@@ -33,37 +25,37 @@ class Bar {
   }
 
   draw() {
-    if (ctx) {
+    if (context.value) {
       // draw top arc
-      ctx.beginPath()
-      ctx.arc(this.x, this.y - bar.length * 1.05, bar.width * 0.2, 0, Math.PI * 2)
-      ctx.fillStyle = `hsla(${this.hue}, 80%, 40%, 0.8)`
-      ctx.fill()
-      ctx.closePath()
+      context.value.beginPath()
+      context.value.arc(this.x, this.y - bar.length * 1.05, bar.width * 0.2, 0, Math.PI * 2)
+      context.value.fillStyle = `hsla(${this.hue}, 80%, 40%, 0.8)`
+      context.value.fill()
+      context.value.closePath()
       // draw bottom arc
       const tmp = (this.y - this.lineY) / bar.length * 100 / 1.5
-      ctx.beginPath()
-      ctx.arc(this.x, this.y, bar.width * 0.8, 0, Math.PI * 2)
-      ctx.fillStyle = `hsla(220, 100%, ${tmp}%, 1)`
-      ctx.fill()
-      ctx.closePath()
+      context.value.beginPath()
+      context.value.arc(this.x, this.y, bar.width * 0.8, 0, Math.PI * 2)
+      context.value.fillStyle = `hsla(220, 100%, ${tmp}%, 1)`
+      context.value.fill()
+      context.value.closePath()
 
       // draw bar
-      ctx.beginPath()
-      ctx.moveTo(this.x, this.y)
-      ctx.lineTo(this.x, this.lineY)
-      ctx.lineWidth = bar.width
-      ctx.lineCap = 'round'
+      context.value.beginPath()
+      context.value.moveTo(this.x, this.y)
+      context.value.lineTo(this.x, this.lineY)
+      context.value.lineWidth = bar.width
+      context.value.lineCap = 'round'
 
-      ctx.strokeStyle = `hsla(${this.hue}, 80%, 20%, 0.6)`
-      ctx.stroke()
-      ctx.closePath()
+      context.value.strokeStyle = `hsla(${this.hue}, 80%, 20%, 0.6)`
+      context.value.stroke()
+      context.value.closePath()
     }
   }
 
   update() {
-    if (mouse.x !== undefined) {
-      const distanceX = Math.abs(this.x - mouse.x) ** 2 * 0.005
+    if (x.value !== undefined) {
+      const distanceX = Math.abs(this.x - x.value) ** 2 * 0.005
       this.targetY = (this.y - bar.length) + distanceX
       if (this.targetY > this.y)
         this.targetY = this.y
@@ -90,7 +82,7 @@ class Bar {
 }
 
 function animationLoop() {
-  ctx?.clearRect(0, 0, w.value, h.value)
+  context.value?.clearRect(0, 0, width.value, height.value)
   drawScene()
   requestAnimationFrame(animationLoop)
 }
@@ -101,37 +93,21 @@ function drawScene() {
   })
 }
 
-function mousemove(e: MouseEvent) {
-  mouse.x = e.x
-  mouse.y = e.y
-}
-
-function mouseout() {
-  mouse.x = 0
-  mouse.y = 0
-}
 function resizeReset() {
-  if (canvas.value) {
-    w.value = canvas.value.width = window.innerWidth || 0
-    h.value = canvas.value.height = window.innerHeight || 600
-  }
   bars = []
-  for (let i = bar.distance * 3 + bar.width / 2; i < w.value - bar.distance * 3; i += bar.width + bar.distance)
-    bars.push(new Bar(i, (h.value + bar.length) * 0.5))
+  for (let i = bar.distance * 3 + bar.width / 2; i < width.value - bar.distance * 3; i += bar.width + bar.distance)
+    bars.push(new Bar(i, (height.value + bar.length) * 0.5))
 }
 
 onMounted(() => {
-  ctx = canvas.value?.getContext('2d') as CanvasRenderingContext2D
   window.addEventListener('resize', resizeReset)
-  window.addEventListener('mousemove', mousemove)
-  window.addEventListener('mouseout', mouseout)
   resizeReset()
   animationLoop()
 })
 </script>
 
 <template>
-  <canvas ref="canvas" />
+  <canvas ref="canvasRef" />
 </template>
 
  <style scoped lang='scss'></style>
