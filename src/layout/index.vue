@@ -8,14 +8,13 @@ import Arrow from '@/components/Arrow.vue'
 import Logo from '@/components/Logo.vue'
 import ThemeBtn from '@/components/ThemeBtn.vue'
 
-const navs: Nav[] = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i)).map((letter, index) => {
-  return {
-    id: index,
-    label: letter,
-    ishover: false,
-    src: imgs[letter],
-  }
-})
+const letters = Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i))
+const navs: Nav[] = letters.map((letter, index) => ({
+  id: index,
+  label: letter,
+  ishover: false,
+  src: imgs[letter],
+}))
 const navList = reactive(navs)
 const currentRouter = useRouter()
 const currentRoute = useRoute()

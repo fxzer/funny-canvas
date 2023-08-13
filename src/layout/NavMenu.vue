@@ -1,5 +1,4 @@
 <script setup lang='ts'>
-
 defineProps({
   navs: {
     type: Array as PropType<Nav[]>,

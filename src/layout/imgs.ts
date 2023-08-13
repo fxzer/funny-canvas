@@ -7,7 +7,9 @@ import F from '@/assets/imgs/f.jpg'
 import G from '@/assets/imgs/g.jpg'
 import H from '@/assets/imgs/h.jpg'
 import I from '@/assets/imgs/i.jpg'
+import J from '@/assets/imgs/j.jpg'
 import K from '@/assets/imgs/k.jpg'
+import L from '@/assets/imgs/l.jpg'
 
 export default {
   a: A,
@@ -19,6 +21,8 @@ export default {
   g: G,
   h: H,
   i: I,
+  j: J,
   k: K,
+  l: L,
 
 } as Img
