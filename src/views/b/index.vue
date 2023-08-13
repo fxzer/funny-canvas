@@ -51,6 +51,8 @@ function resume() {
   context.value!.shadowColor = 'hsla(120,100%,50%,0.5)'
   context.value!.shadowBlur = 2
   context.value!.fillStyle = 'hsla(120,100%,20%,1)'
+  const initx = width.value / 2 - 200
+  const inity = 100
   context.value!.globalCompositeOperation = 'lighter'
   // 如果当前行是正在输入的那一行，只绘制到当前输入位置（col 列）。否则，绘制整行代码
   for (let i = 0; i <= row; i++) {
@@ -60,14 +62,14 @@ function resume() {
 
     // 字体大小
     context.value!.font = '16px monospace'
-    context.value!.fillText(line, 100, 100 + i * 16)
+    context.value!.fillText(line, initx, inity + i * 16)
   }
 
   // 绘制光标
   context.value!.fillStyle = 'hsla(120,100%,50%,1)'
   if (codeLines[row]) {
-    const x = 100 + context.value!.measureText(codeLines[row]?.substring(0, col)).width
-    const y = 100 + row * 16 - 14
+    const x = initx + context.value!.measureText(codeLines[row]?.substring(0, col)).width
+    const y = inity + row * 16 - 14
     context.value!.fillRect(x, y, 10, 14)
   }
   if (col >= codeLines[row]?.length) { // 换行
