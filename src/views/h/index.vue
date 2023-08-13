@@ -92,7 +92,7 @@ onMounted(() => {
 <template>
   <div class="h-full relative bg-white/10  backdrop-blur">
     <canvas ref="canvasRef" />
-    <input id="upload" ref="audioFile" type="file" class=" hidden " @change="handleAudioFileChange">
+    <input id="upload" ref="audioFile" type="file" class="hidden " @change="handleAudioFileChange">
     <div
       class="w-80 left-0 right-0 mx-auto z-50 bg-white/50  backdrop-blur absolute bottom-36 rounded-full overflow-hidden flex-y-center"
     >

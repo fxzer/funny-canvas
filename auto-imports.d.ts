@@ -63,6 +63,7 @@ declare global {
   const useFps: typeof import('@vueuse/core')['useFps']
   const useLink: typeof import('vue-router')['useLink']
   const useMouse: typeof import('@vueuse/core')['useMouse']
+  const useRafFn: typeof import('@vueuse/core')['useRafFn']
   const useResizeObserver: typeof import('@vueuse/core')['useResizeObserver']
   const useRoute: typeof import('vue-router')['useRoute']
   const useRouter: typeof import('vue-router')['useRouter']

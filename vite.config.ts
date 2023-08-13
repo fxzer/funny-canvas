@@ -27,6 +27,7 @@ export default defineConfig({
           'useFps',
           'useMouse',
           'useTitle',
+          'useRafFn',
           'useDebounceFn',
         ],
       },
