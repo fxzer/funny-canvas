@@ -6,7 +6,7 @@
   <video
     autoplay loop
     muted
-    src="/starnight.mp4"
+    src="../../assets/starnight.mp4"
   />
 </template>
 
