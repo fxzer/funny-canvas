@@ -22,10 +22,10 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      #使用pnpm
+      # 使用pnpm
       - name: Install pnpm
         run: npm install -g pnpm
-      - name: Build 🔧 
+      - name: Build 🔧
         run: |
           pnpm install --no-frozen-lockfile
           pnpm run build

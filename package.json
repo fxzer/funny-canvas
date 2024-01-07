@@ -12,7 +12,6 @@
     "gt": "node ./script/generate-template.cjs"
   },
   "dependencies": {
-    "@antfu/eslint-config": "^0.40.2",
     "@types/three": "^0.152.0",
     "@vueuse/core": "^10.1.2",
     "add": "^2.0.6",
@@ -24,11 +23,14 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^2.6.1",
     "@types/node": "^20.1.2",
     "@unocss/preset-rem-to-px": "^0.55.0",
     "@unocss/reset": "^0.55.0",
     "@vitejs/plugin-vue": "^4.1.0",
     "autoprefixer": "^10.4.14",
+    "eslint": "npm:eslint-ts-patch@^8.56.0-0",
+    "eslint-plugin-format": "^0.1.0",
     "file-save": "^0.2.0",
     "postcss": "^8.4.23",
     "typescript": "^5.0.2",

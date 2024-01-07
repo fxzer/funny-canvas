@@ -101,8 +101,8 @@ function handleRGB(data: Uint8ClampedArray | never[], width: number, height: num
 function calculateBrightness(r: number, g: number, b: number) {
   return Math.sqrt(
     (r * r) * 0.299
-      + (g * g) * 0.587
-      + (b * b) * 0.114,
+    + (g * g) * 0.587
+    + (b * b) * 0.114,
   ) / 100
 }
 

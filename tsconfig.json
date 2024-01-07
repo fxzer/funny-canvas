@@ -1,29 +1,29 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "target": "ES2020",
-    "noEmitOnError": false,
+    "jsx": "preserve",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
 
     /* Bundler mode */
     "moduleResolution": "node",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "preserve",
     "paths": {
       "@/*": ["./src/*"] // 解决：tsconfig.json(19,14): error TS2307: Cannot find module '@/xxx'
     },
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
     /* Linting */
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noEmit": true,
+    "noEmitOnError": false,
+    "isolatedModules": true,
+    "skipLibCheck": true
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/canvas-routes.ts","colorthief.d.ts", "auto-imports.d.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "src/router/canvas-routes.ts", "colorthief.d.ts", "auto-imports.d.ts"]
 }
