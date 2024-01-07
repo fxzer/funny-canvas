@@ -12,7 +12,7 @@ import K from '@/assets/imgs/k.jpg'
 import L from '@/assets/imgs/l.jpg'
 import M from '@/assets/imgs/m.jpg'
 import N from '@/assets/imgs/n.jpg'
-import O from '/vangogh/1.jpg'
+import O from '@/assets/imgs/o.jpg'
 
 export default {
   a: A,

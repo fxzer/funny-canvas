@@ -1,3 +1,6 @@
+<script setup lang="ts">
+</script>
+
 <template>
   <div bg-repeat flex-center wh-full class="stars">
     <div z-10>
@@ -6,7 +9,7 @@
       </h1>
       <div class="container">
         <div id="carousel">
-          <div v-for="i in 9" :key="i" class="item" :class="`item${i}`" :style="`background: url('/vangogh/${i}.jpg')`" />
+          <div v-for="i in 9" :key="i" class="item" :class="`item${i}`" />
         </div>
       </div>
     </div>
@@ -47,6 +50,35 @@
     background-position: center;
     overflow: hidden;
   }
+  .item1 {
+    background-image: url(/m/1.jpg);
+  }
+  .item2 {
+    background-image: url(/m/2.jpg);
+  }
+  .item3 {
+    background-image: url(/m/3.jpg);
+  }
+  .item4 {
+    background-image: url(/m/4.jpg);
+  }
+  .item5 {
+    background-image: url(/m/5.jpg);
+  }
+  .item6 {
+    background-image: url(/m/6.jpg);
+  }
+  .item7 {
+    background-image: url(/m/7.jpg);
+  }
+
+  .item8 {
+    background-image: url(/m/8.jpg);
+  }
+  .item9 {
+    background-image: url(/m/9.jpg);
+  }
+
   @for $i from 1 through 9 {
     .item:nth-child(#{$i}) {
       transform: rotateY(40deg * ($i - 1)) translateZ(288px);

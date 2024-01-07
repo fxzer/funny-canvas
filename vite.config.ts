@@ -5,7 +5,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/funny-canvas/',
   plugins: [vue(), UnoCSS(), AutoImport({
     include: [
       // 导入目标文件类型
