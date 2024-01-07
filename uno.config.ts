@@ -1,5 +1,6 @@
 import {
   defineConfig,
+  presetAttributify,
   presetUno,
   transformerDirectives,
   transformerVariantGroup,
@@ -34,6 +35,7 @@ export default defineConfig({
   presets: [
     presetUno(),
     presetRemToPx(),
+    presetAttributify(),
   ],
   transformers: [
     transformerDirectives(), // @apply, @screen, @variants

@@ -10,6 +10,9 @@ import I from '@/assets/imgs/i.jpg'
 import J from '@/assets/imgs/j.jpg'
 import K from '@/assets/imgs/k.jpg'
 import L from '@/assets/imgs/l.jpg'
+import M from '@/assets/imgs/m.jpg'
+import N from '@/assets/imgs/n.jpg'
+import O from '/vangogh/1.jpg'
 
 export default {
   a: A,
@@ -24,5 +27,8 @@ export default {
   j: J,
   k: K,
   l: L,
+  m: M,
+  n: N,
+  o: O,
 
 } as Img

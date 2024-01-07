@@ -26,6 +26,9 @@ dependencies:
   three:
     specifier: ^0.152.2
     version: 0.152.2
+  tweenjs:
+    specifier: ^1.0.2
+    version: 1.0.2
   vue:
     specifier: ^3.2.47
     version: 3.2.47
@@ -3768,6 +3771,10 @@ packages:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
     dependencies:
       safe-buffer: 5.2.1
+    dev: false
+
+  /tweenjs@1.0.2:
+    resolution: {integrity: sha512-WnFozCNkUkmJtLqJyGrToxVojW2Srzudktr8BzFKQijQRVcmlq7Fc+qfo75ccnwIJGiRWbXKfg7qU67Tzbb1bg==}
     dev: false
 
   /tweetnacl@0.14.5:
