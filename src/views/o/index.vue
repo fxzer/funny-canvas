@@ -6,7 +6,7 @@
   <video
     autoplay loop
     muted
-    src="../../assets/starnight.mp4"
+    src="https://zerdocs.oss-cn-shanghai.aliyuncs.com/starnight.mp4"
   />
 </template>
 
