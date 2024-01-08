@@ -18,14 +18,10 @@ jobs:
           persist-credentials: false
           fetch-depth: 0 # github代码拉取深度
 
-      - name: Get repository name
-        run: |
-          echo "REPO_NAME=${{ github.repository }}" >> $GITHUB_ENV
-          echo $REPO_NAME
-      - name: Get username
+      - name: Get USERNAME and REPO_NAME
         run: |
           echo "USERNAME=${{ github.actor }}" >> $GITHUB_ENV
-          echo $USERNAME
+          echo "REPO_NAME=${{ github.repository }}" >> $GITHUB_ENV
 
       - name: Install Node.js
         uses: actions/setup-node@v3
