@@ -18,19 +18,7 @@ export default defineConfig({
       // 预定义
       'vue', // 自动导入 Vue 相关函数，如：ref, reactive, toRef 等
       'vue-router',
-      {
-        '@vueuse/core': [
-          'useMouse',
-          'useElementSize',
-          'useToggle',
-          'useDark',
-          'useFps',
-          'useMouse',
-          'useTitle',
-          'useRafFn',
-          'useDebounceFn',
-        ],
-      },
+      '@vueuse/core',
     ],
     dts: true, // 为导入的文件生成 .d.ts 文件
     dirs: [
