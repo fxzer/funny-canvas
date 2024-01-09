@@ -116,7 +116,7 @@ class Particle {
     this.y = y
     this.radius = radius
     this.color = color
-    this.velocity = 0.04
+    this.velocity = 0.06
     this.distanceFromCenter = randomIntFromRange(50, 120)
     this.lastMouse = { x, y }
   }
@@ -144,9 +144,8 @@ class Particle {
     this.y = this.lastMouse.y + Math.sin(this.radians) * this.distanceFromCenter
 
     // 拖尾效果
-    this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.05
-    this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.05
-
+    this.lastMouse.x += (mouse.x - this.lastMouse.x) * 0.06
+    this.lastMouse.y += (mouse.y - this.lastMouse.y) * 0.06
     this.draw(lastPoint)
   }
 }
@@ -158,25 +157,29 @@ function init() {
     particles.push(new Particle(width.value / 2, height.value / 2, radius, randomColor(colors)))
   }
 }
-
+let rafId = 0
+const isDark = useDark()
 function animate() {
-  requestAnimationFrame(animate)
+  rafId = requestAnimationFrame(animate)
   if (context.value) {
-    context.value.fillStyle = 'rgba(255, 255, 255, 0.05)'
+    context.value.fillStyle = isDark.value ? 'rgba(0,0,0,0.05)' : 'rgba(255, 255, 255, 0.05)'
     context.value.fillRect(0, 0, width.value, height.value)
-    // context.value?.clearRect(0, 0, width.value, height.value)
   }
   particles.forEach((particle) => {
     particle.update()
   })
 }
+watchEffect(() => {
+  cancelAnimationFrame(rafId)
+  animate()
+})
 
 init()
 animate()
 </script>
 
 <template>
-  <canvas ref="canvasRef" style="background-color: transparent;" />
+  <canvas ref="canvasRef" class="backdrop-blur" />
 </template>
 
 <style scoped lang='scss'>

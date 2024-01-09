@@ -6,7 +6,7 @@ const codeLines: string[] = [
   '                o8888888o',
   '               88" .  "88',
   '               (|  -_-  |)',
-  '               0\   =   /0',
+  '               0\    =   /0',
   '              ___/`---\'\___',
   '            .\' \\|      |// \'.',
   '            / \\\\|||  :  |||// \\',
@@ -84,5 +84,5 @@ onMounted(() => draw())
 </script>
 
 <template>
-  <canvas ref="canvasRef" class=" backdrop-blur" />
+  <canvas ref="canvasRef" class="backdrop-blur" />
 </template>
