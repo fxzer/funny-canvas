@@ -15,7 +15,7 @@ const router = createRouter({
 })
 router.beforeEach((to, _, next) => {
   const title = useTitle()
-  title.value = <string>to.name || ''
+  title.value = `Funny Canvas - ${<string>to.name || ''}`
   next()
 })
 

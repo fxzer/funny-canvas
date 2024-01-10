@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 const { canvasRef, context, width, height } = useCanvas()
 const particles: Particle[] = []
-const numbers: number[][][] = []
+const numbersData: number[][][] = []
 let count = 60
 let index = 0
 
@@ -19,7 +19,7 @@ class Particle {
   constructor(x: number, y: number) {
     this.x = x
     this.y = y
-    this.vx = (Math.random() - 0.5) * 4
+    this.vx = 1
     this.vy = Math.random() * 3 + 5
     this.g = this.vy
     this.ty = 0.1
@@ -31,12 +31,16 @@ class Particle {
   update() {
     if (this.fall) {
       if (this.y >= height.value) {
-        this.g *= Math.random() * 0.8
+        this.g *= 0.8
         this.vy = -this.g
+        this.vx = Math.random() > 0.5 ? Math.random() * 2 : -Math.random() * 2
       }
-      this.x += this.vx
+
+      const airResistance = 0.01 * this.vy
       this.y += this.vy
-      this.vy += this.ty
+      this.x += this.vx
+
+      this.vy += this.ty - airResistance
     }
     this.opt += 0.01
   }
@@ -52,9 +56,8 @@ class Particle {
 }
 
 function change(i: number) {
-  for (const j in numbers[i]) {
-    const p = numbers[i][j]
-    // console.log('[ p ]-57', p)
+  for (const j in numbersData[i]) {
+    const p = numbersData[i][j]
     particles.push(new Particle(p[0], p[1]))
   }
 }
@@ -76,7 +79,7 @@ function init() {
         tdata.push([x * 20 + (width.value - w * 20) / 2, y * 20 + (height.value - 40 * 20) / 2 - 200])
       }
     }
-    numbers.push(tdata)
+    numbersData.push(tdata)
     context.value.clearRect(0, 0, 40, 41)
   }
 }
@@ -100,7 +103,7 @@ function animate() {
     change(10 - index)
     count = 0
     index++
-    index = index % numbers.length
+    index = index % numbersData.length
   }
   requestAnimationFrame(animate)
 }

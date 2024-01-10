@@ -7,7 +7,7 @@ defineProps({
 })
 
 const currentRoute = useRoute()
-const activeClass = (path: string) => currentRoute.path === path ? 'text-green scale-125' : 'text-zinc'
+const activeClass = (path: string) => currentRoute.path === path ? '!text-green scale-125' : 'text-zinc'
 </script>
 
 <template>
