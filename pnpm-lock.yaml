@@ -17,6 +17,9 @@ dependencies:
   colorthief:
     specifier: ^2.4.0
     version: 2.4.0
+  gsap:
+    specifier: ^3.12.4
+    version: 3.12.4
   pnpm:
     specifier: ^8.6.12
     version: 8.6.12
@@ -26,9 +29,6 @@ dependencies:
   three:
     specifier: ^0.152.2
     version: 0.152.2
-  tweenjs:
-    specifier: ^1.0.2
-    version: 1.0.2
   vue:
     specifier: ^3.2.47
     version: 3.2.47
@@ -2535,6 +2535,10 @@ packages:
     resolution: {integrity: sha512-EtKwoO6kxCL9WO5xipiHTZlSzBm7WLT627TqC/uVRd0HKmq8NXyebnNYxDoBi7wt8eTWrUrKXCOVaFq9x1kgag==}
     dev: true
 
+  /gsap@3.12.4:
+    resolution: {integrity: sha512-1ByAq8dD0W4aBZ/JArgaQvc0gyUfkGkP8mgAQa0qZGdpOKlSOhOf+WNXjoLimKaKG3Z4Iu6DKZtnyszqQeyqWQ==}
+    dev: false
+
   /gzip-size@6.0.0:
     resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
     engines: {node: '>=10'}
@@ -3771,10 +3775,6 @@ packages:
     resolution: {integrity: sha512-McnNiV1l8RYeY8tBgEpuodCC1mLUdbSN+CYBL7kJsJNInOP8UjDDEwdk6Mw60vdLLrr5NHKZhMAOSrR2NZuQ+w==}
     dependencies:
       safe-buffer: 5.2.1
-    dev: false
-
-  /tweenjs@1.0.2:
-    resolution: {integrity: sha512-WnFozCNkUkmJtLqJyGrToxVojW2Srzudktr8BzFKQijQRVcmlq7Fc+qfo75ccnwIJGiRWbXKfg7qU67Tzbb1bg==}
     dev: false
 
   /tweetnacl@0.14.5:
