@@ -47,6 +47,7 @@ function switchHandler(direction: Direction) {
 }
 
 const isDark = useDark()
+isDark.value = true
 const toggleDark = useToggle(isDark)
 </script>
 

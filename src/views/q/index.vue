@@ -56,7 +56,7 @@ class Particle {
 function init() {
   particles = []
   for (let i = 0; i < 200; i++) {
-    const radius = randomIntFromRange(1, 4)
+    const radius = randomIntFromRange(0.1, 2)
     const x = randomIntFromRange(radius - halfWidth.value, width.value - radius)
     const y = randomIntFromRange(radius - halfHeight.value - 300, height.value - radius + 300)
     particles.push(new Particle(x, y, radius, randomColor(colors)))
@@ -65,7 +65,7 @@ function init() {
 let rafId = 0.01
 const isDark = useDark()
 let radians = 0
-const radian = ref(0.005)
+const radian = ref(0.001)
 const alpha = ref(1)
 const { pressed } = useMousePressed({ target: canvasRef })
 function animate() {
@@ -101,7 +101,7 @@ function speedUp() {
   }
   else {
     i = 1
-    radian.value = 0.005
+    radian.value = 0.001
   }
 }
 init()
