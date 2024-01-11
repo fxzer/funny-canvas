@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import colors from '@/contants/colors'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ init, animate })
 let particles: Particle[] = []
 
 function randomColor(colors: string[]) {
@@ -61,10 +61,8 @@ function init() {
   particles = []
   generateParticles()
 }
-let rafId = 0
 const isDark = useDark()
 function animate() {
-  rafId = requestAnimationFrame(animate)
   if (context.value) {
     context.value.clearRect(0, 0, width.value, height.value)
     context.value.fillStyle = isDark.value ? 'rgba(0,0,0,0.05)' : 'rgba(255, 255, 255, 0.05)'
@@ -77,10 +75,6 @@ function animate() {
       particle.update()
   })
 }
-watchEffect(() => {
-  cancelAnimationFrame(rafId)
-  animate()
-})
 
 // 生成粒子
 function generateParticles(count = 30) {
@@ -97,8 +91,6 @@ function generateParticles(count = 30) {
 function onClick() {
   setTimeout(generateParticles, 50)
 }
-init()
-animate()
 </script>
 
 <template>

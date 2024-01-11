@@ -1,4 +1,7 @@
 <script setup lang='ts'>
+import { useCongratPass } from '@/hooks/useCongrate'
+
+const mouse = useMouse()
 const { canvasRef } = useCanvas()
 function getRandom(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -102,7 +105,16 @@ class CloudHeart {
 }
 
 class GrowHeart {
-  constructor(img, x, y, canvas) {
+  size: number
+  x: number
+  y: number
+  img: any
+  dead: boolean
+  fadeout: boolean
+  birthday: any
+  w: number
+  alpha: number
+  constructor(img: any, x: number, y: number, canvas: any) {
     this.size = 0
     this.x = x
     this.y = y
@@ -118,7 +130,7 @@ class GrowHeart {
     this.fadeout = true
   }
 
-  animate(ts) {
+  animate(ts: any) {
     const elapsed = ts - this.birthday
 
     this.size += elapsed / 10
@@ -139,13 +151,14 @@ class HeartCloud {
   canvas: HTMLCanvasElement
   ctx: any
   cycle: any
+  rqfid: number
   constructor(el: HTMLCanvasElement, svg: HTMLElement) {
     this.size = 20
     this.paint = false
     this.clicking = false
     this.heartArray = []
     this.color = 'rgb(255,83,93)'
-
+    this.rqfid = 0
     this.svg = svg
 
     this.canvas = el
@@ -169,7 +182,7 @@ class HeartCloud {
   }
 
   bindEvents() {
-    window.addEventListener('resize', () => this.canvasSize())
+    // window.addEventListener('resize', () => this.canvasSize())
 
     this.canvas.addEventListener('mousedown', () => { this.clicking = true })
     this.canvas.addEventListener('mouseup', () => {
@@ -180,10 +193,10 @@ class HeartCloud {
     const down = ['mouseenter', 'touchstart']
 
     down.forEach((i) => {
-      this.canvas.addEventListener(i, (e) => {
+      this.canvas.addEventListener(i, () => {
         this.paint = true
-        this.pushLogo(e)
-        this.cycle = setInterval(() => this.pushLogo(e), 100)
+        this.pushLogo()
+        this.cycle = setInterval(() => this.pushLogo(), 100)
       }, false)
     })
 
@@ -199,11 +212,11 @@ class HeartCloud {
     const drag = ['mousemove', 'touchdrag']
 
     drag.forEach((i) => {
-      this.canvas.addEventListener(i, (e) => {
+      this.canvas.addEventListener(i, () => {
         this.clearCycle()
         if (this.paint) {
-          this.pushLogo(e)
-          this.cycle = setInterval(() => this.pushLogo(e), 100)
+          this.pushLogo()
+          this.cycle = setInterval(() => this.pushLogo(), 100)
         }
       }, false)
     })
@@ -221,7 +234,7 @@ class HeartCloud {
     this.cycle = null
   }
 
-  pushLogo(e: any) {
+  pushLogo() {
     const cloudSize = Math.floor(getRandom(20, 100) / this.size)
 
     for (let i = 0; i < cloudSize; i++) {
@@ -232,8 +245,8 @@ class HeartCloud {
         const GH = new GrowHeart(
           // getRandom(this.size - 20, this.size + 20),
           this.createImg(color),
-          this.getMousePos(e).x,
-          this.getMousePos(e).y,
+          this.getMousePos().x,
+          this.getMousePos().y,
           this.canvas,
         )
 
@@ -243,8 +256,8 @@ class HeartCloud {
         const CH = new CloudHeart(
           getRandom(this.size - 20, this.size + 20),
           this.createImg(color),
-          this.getMousePos(e).x,
-          this.getMousePos(e).y,
+          this.getMousePos().x,
+          this.getMousePos().y,
         )
 
         this.heartArray.push(CH)
@@ -260,11 +273,10 @@ class HeartCloud {
     return img
   }
 
-  getMousePos(e: any) {
+  getMousePos() {
     const rect = this.canvas.getBoundingClientRect()
-
-    const left = e.clientX ? e.clientX : e.targetTouches[0].clientX
-    const top = e.clientY ? e.clientY : e.targetTouches[0].clientY
+    const left = mouse.x.value
+    const top = mouse.y.value
 
     return {
       x: left - rect.left,
@@ -291,8 +303,8 @@ class HeartCloud {
         }
       }
     }
-
-    requestAnimationFrame(ts => this.animateCanvas(ts))
+    cancelAnimationFrame(this.rqfid)
+    this.rqfid = requestAnimationFrame(ts => this.animateCanvas(ts))
   }
 }
 
@@ -301,14 +313,19 @@ onMounted(() => {
   const canvas = document.querySelector('canvas')
 
   canvas && heart && new HeartCloud(canvas, heart)
+  window.addEventListener('click', () => {
+    document.querySelector('.tip')?.classList.add('!hidden')
+  })
 })
 </script>
 
 <template>
   <canvas ref="canvasRef" />
   <svg class="heart hidden cursor-crosshair" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 133.8 133.8"><g id="inner"><path class="st0" d="M41.9 100.7L11.8 70.6C-2 56.8-2 34.3 11.8 20.5c13.8-13.8 36.3-13.8 50.1 0L92 50.6c13.8 13.8 13.8 36.3 0 50.1-13.8 13.8-36.4 13.8-50.1 0z" /><path class="st0" d="M41.9 50.6L72 20.5c13.8-13.8 36.3-13.8 50.1 0 13.8 13.8 13.8 36.3 0 50.1L92 100.7c-13.8 13.8-36.3 13.8-50.1 0-13.8-13.8-13.8-36.3 0-50.1z" /><path class="st0" d="M63.4 122.2L36.6 95.4c-1.9-1.9-1.9-5.1 0-7.1l26.8-26.8c1.9-1.9 5.1-1.9 7.1 0l26.8 26.8c1.9 1.9 1.9 5.1 0 7.1l-26.8 26.8c-2 1.9-5.2 1.9-7.1 0z" /></g></svg>
+  <div fixed class="tip cursor-pointer  top-1/2 left-1/2 text-gray z-10">
+    请点击屏幕
+  </div>
+  <div fixed class="tip cursor-pointer bottom-3 right-3 text-gray select-none z-10 hover:(bg-gray-400/20 text-amber)  p-2 rounded" @click="useCongratPass(200)">
+    完结撒花
+  </div>
 </template>
-
-<style scoped lang='scss'>
-
-</style>

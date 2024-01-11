@@ -1,7 +1,6 @@
 <script setup lang='ts'>
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 const fps = useFps()
-let requestAnimationId = 0
 const template = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890@#$%^&*()'
 const templateArr = template.split('')
 const fontSize = 16
@@ -23,8 +22,7 @@ function draw() {
     drops[i] += 1
   }
 }
-function amimate() {
-  requestAnimationId = window.requestAnimationFrame(amimate)
+function animate() {
   draw()
 }
 // 显示屏幕刷新率
@@ -41,10 +39,7 @@ onMounted(() => {
   for (let i = 0; i < columns; i++)
     drops[i] = 1
 
-  amimate()
-})
-onUnmounted(() => {
-  window.cancelAnimationFrame(requestAnimationId)
+  animate()
 })
 </script>
 
@@ -53,4 +48,3 @@ onUnmounted(() => {
 </template>
 
 <style scoped lang='scss'></style>
-@/hooks/useCanvas

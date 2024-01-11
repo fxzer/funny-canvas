@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import colors from '@/contants/colors'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 let triangles: Triangle[] = []
 let count = 0
 
@@ -39,7 +39,7 @@ class Triangle {
   active: boolean
   targetAngle: number // 目标角度
   rotateAngle: number // 旋转角度
-  color:string
+  color: string
 
   constructor(x: number, y: number, r: number, angle: number) {
     this.x = x
@@ -106,10 +106,10 @@ function animate() {
   count--
   if (count < 0)
     init()
-  requestAnimationFrame(animate)
+  // requestAnimationFrame(animate)
 }
 init()
-onMounted(animate)
+// onMounted(animate)
 </script>
 
 <template>

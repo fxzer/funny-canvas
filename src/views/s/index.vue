@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import colors from '@/contants/colors'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ init, animate })
 const r1 = 380
 const r2 = 190
 const r3 = 180
@@ -70,7 +70,6 @@ function animate() {
   }
   index++
   index = index % points.length
-  requestAnimationFrame(animate)
 }
 
 function renderPoint(x: number, y: number, r: number, color: string) {
@@ -91,15 +90,8 @@ function init() {
     points.push({ x, y })
   }
 }
-
-init()
-onMounted(animate)
 </script>
 
 <template>
   <canvas ref="canvasRef" />
 </template>
-
-<style scoped lang='scss'>
-
-</style>

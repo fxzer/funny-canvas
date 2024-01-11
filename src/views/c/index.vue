@@ -1,119 +1,143 @@
-<script lang="ts" setup>
-const { x, y } = useMouse()
-const { canvasRef, context, width, height } = useCanvas()
+<script setup lang='ts'>
+import colors from '@/contants/colors'
 
-let particlesArray: Particle[] = []
-const mouseRadius = 200
-/* 自定义例子颜色，数量，密度 */
-class Particle { // 粒子
+const { canvasRef, context, width, height } = useCanvas({ animate })
+const { x, y } = useMouse()
+const points: Point[] = []
+const spacing = 100
+const spread = spacing * 0.25
+let cols: number, rows: number
+let tick: number, basePoint, rightPoint, botPoint
+
+class Point {
   x: number
   y: number
-  size: number
-  baseX: number
-  baseY: number
-  density: number
-
-  constructor(x: number, y: number) {
-    this.x = x
-    this.y = y
-    this.size = 2 // 粒子大小
-    this.baseX = this.x // 粒子初始位置
-    this.baseY = this.y // 粒子初始位置
-    this.density = (Math.random() * 10) + 1 // 粒子密度
+  xBase: number
+  yBase: number
+  offset: number
+  duration: number
+  range: number
+  dir: number
+  rad: number
+  rotateAngle: number
+  constructor(opt: any) {
+    this.x = opt.x
+    this.y = opt.y
+    this.xBase = this.x
+    this.yBase = this.y
+    this.offset = random(0, 1000)
+    this.duration = random(20, 60)
+    this.range = random(3, 6)
+    this.dir = random(0, 1) > 0.5 ? 1 : -1
+    this.rad = random(2, 4)
+    this.rotateAngle = random(0, Math.PI * 2) // 随机旋转角度
   }
 
   draw() {
-    context.value?.beginPath()
-    context.value!.fillStyle = 'green'
-    context.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
-    context.value?.closePath()
-    context.value?.fill()
+    if (!context.value)
+      return
+    context.value.save()
+    context.value.beginPath()
+    context.value.translate(this.x, this.y)
+    context.value.rotate(this.rotateAngle)
+    context.value.rect(-6, -6, 12, 12)
+    context.value.fill()
+    context.value.stroke()
+    context.value.closePath()
+    context.value.restore()
   }
 
   update() {
-    const dx = x.value - this.x
-    const dy = y.value - this.y
-    const distance = Math.sqrt(dx * dx + dy * dy) // 粒子与鼠标的距离
+    this.x = this.xBase + this.dir * Math.sin((tick + this.offset) / this.duration) * this.range
+    this.y = this.yBase + this.dir * Math.cos((tick + this.offset) / this.duration) * this.range
+    const angle = angleTo(this, new Point({ x: x.value, y: y.value }))
+    this.x = this.x + Math.cos(angle) * 100
+    this.y = this.y + Math.sin(angle) * 100
+  }
+}
+function angleTo(p1: Point, p2: Point) {
+  const dx = p1.x - p2.x
+  const dy = p1.y - p2.y
+  return Math.atan2(dy, dx)
+}
+function init() {
+  x.value = width.value / 2
+  y.value = height.value / 2
+  cols = 0
+  rows = 0
+  points.length = 0
+  tick = 0
+  createPoints()
+}
 
-    // 计算力度
-    const forceDirectionX = dx / distance
-    const forceDirectionY = dy / distance
+function random(min: number, max: number) {
+  return Math.random() * (max - min) + min
+}
 
-    const maxDistance = mouseRadius
-    const force = (maxDistance - distance) / maxDistance
-    const directionX = forceDirectionX * force * this.density
-    const directionY = forceDirectionY * force * this.density
-    if (distance < mouseRadius) { // 在鼠标半径范围内的粒子
-      this.x -= directionX
-      this.y -= directionY
-    }
-    else { // 不在鼠标半径范围内的粒子
-      const speed = 20 // 粒子回到初始位置的速度越大越慢
-      if (this.x !== this.baseX) {
-        const dx = this.x - this.baseX
-        this.x -= dx / speed
-      }
-      if (this.y !== this.baseY) {
-        const dy = this.y - this.baseY
-        this.y -= dy / speed
-      }
+// 创建一些点，每个点都有一个随机的偏移量
+function createPoints() {
+  for (let x = -spacing / 2; x < width.value + spacing; x += spacing) {
+    cols++
+    for (let y = -spacing / 2; y < height.value + spacing; y += spacing) {
+      if (x === -spacing / 2)
+        rows++
+
+      points.push(new Point({
+        x: x + random(-spread, spread),
+        y: y + random(-spread, spread),
+      }))
     }
   }
 }
-function fillText() {
-  /* 文字粒子 */
-  particlesArray = []
-  const fontSize = 240
-  const text = 'ABC'
-  context.value!.font = `${fontSize}px Verdana` // 字体大小
-  context.value?.fillText(text, 0, fontSize - (0.2 * fontSize), width.value) // 让文字初始化在 canvas 最左上角
-  const textCoordinates = context.value?.getImageData(0, 0, width.value, height.value)
-  const { width: w = 0, height: h = 0, data = [] } = textCoordinates || {}
-  for (let x = 0; x < w; x++) {
-    for (let y = 0; y < h; y++) {
-      if (data[(y * 4 * w) + (x * 4) + 3] > 128) {
-        const { px, py } = calculateOffset(x, y, fontSize, text)
-        particlesArray.push(new Particle(px, py))
-      }
-    }
-  }
-}
-// 计算每个粒子的位置偏移，始终保持居中展示
-function calculateOffset(x: number, y: number, fs: number, text: string) {
-  const len = text.length
-  const tw = fs * len
-  const px = x + width.value / 2 - tw * 0.8 / 2
-  const py = y + height.value / 2 - fs / 2
-  return { px, py }
-}
-// function randomParticle() {
-//   for (let i = 0; i < 100; i++) {
-//     const x = Math.floor(Math.random() * width.value)
-//     const y = Math.floor(Math.random() * height.value)
-//     const particle = new Particle(x, y)
-//     particlesArray.push(particle)
-//   }
-// }
-
-// 动画
+let index = 0
 function animate() {
-  if (!context.value || !canvasRef.value)
+  if (!context.value)
     return
+  index++
   context.value?.clearRect(0, 0, width.value, height.value)
-  for (let i = 0; i < particlesArray.length; i++) {
-    particlesArray[i].draw()
-    particlesArray[i].update()
+  context.value.lineWidth = 2
+  context.value.beginPath()
+  if (index % 60 === 0) { // 每隔60帧清空画布，换颜色
+    context.value!.strokeStyle = colors[Math.floor(Math.random() * colors.length)]
   }
-  requestAnimationFrame(animate)
+  for (let x = 0; x < cols; x++) {
+    for (let y = 0; y < rows; y++) {
+      basePoint = points[x * rows + y]
+      rightPoint = x === cols - 1 ? null : points[(x + 1) * rows + y]
+      botPoint = y === rows - 1 ? null : points[x * rows + y + 1]
+
+      if (rightPoint) {
+        context.value.moveTo(basePoint.x, basePoint.y)
+        context.value.lineTo(rightPoint.x, rightPoint.y)
+      }
+      if (botPoint) {
+        context.value.moveTo(basePoint.x, basePoint.y)
+        context.value.lineTo(botPoint.x, botPoint.y)
+      }
+    }
+  }
+  context.value.stroke()
+  context.value.fillStyle = '#000'
+  points.forEach((point) => {
+    point.update()
+    point.draw()
+  })
+
+  // 画一个 径向渐变的圆
+  const gradient = context.value.createRadialGradient(x.value, y.value, 0, x.value, y.value, 400)
+  gradient.addColorStop(0, 'hsla(0, 0%, 0%, 0)')
+  gradient.addColorStop(1, 'hsla(0, 0%, 0%, 0.85)')
+  context.value.fillStyle = gradient
+  context.value.fillRect(0, 0, width.value, height.value)
 }
 
+init()
 onMounted(() => {
-  fillText()
-  // randomParticle()
-  animate()
+  context.value!.strokeStyle = 'green'
 })
+useResizeObserver(canvasRef, init)
 </script>
 
 <template>
-  <canvas ref="canvasRef" />
+  <canvas ref="canvasRef" bg-black />
 </template>

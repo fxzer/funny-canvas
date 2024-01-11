@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 const hexs: Hex[] = []
 const max = Math.sqrt(
   height.value ** 2
@@ -55,7 +55,6 @@ function init() {
       hexs.push(new Hex(w * 120 + (h % 2) * 60, h * Math.sqrt(1200)))
   }
 }
-init()
 function animate() {
   if (!context.value)
     return
@@ -65,9 +64,8 @@ function animate() {
     h.update()
     h.draw()
   }
-  requestAnimationFrame(animate)
 }
-onMounted(animate)
+init()
 </script>
 
 <template>

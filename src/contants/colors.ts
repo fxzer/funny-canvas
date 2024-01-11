@@ -80,4 +80,11 @@ export default [
   '#49d0a2',
   '#4ad1ab',
   '#4ad1b4',
+  /*  */
+  '#FFB65D',
+  '#FADC6D',
+  '#5EDFD6',
+  '#E865DF',
+  '#A871E3',
+  '#6AA1FF',
 ]

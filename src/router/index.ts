@@ -1,5 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import canvasRoutes from './canvas-routes'
+import type { RouteRecordRaw } from 'vue-router'
+
+const routeModules = import.meta.glob('../views/*/index.vue')
+const canvasRoutes: RouteRecordRaw[] = 'abcdefghijklmnopqrstuvwxyz'.split('').map(letter => ({
+  path: `/${letter}`,
+  name: letter.toUpperCase(),
+  component: routeModules[`../views/${letter}/index.vue`],
+}))
 
 const routes = [
   {

@@ -5,7 +5,6 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "useDefineForClassFields": true,
     "module": "ESNext",
-
     /* Bundler mode */
     "moduleResolution": "node",
     "paths": {
@@ -21,6 +20,7 @@
     "noUnusedParameters": true,
     "noEmit": true,
     "noEmitOnError": false,
+    "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
     "skipLibCheck": true
   },

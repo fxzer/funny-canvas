@@ -18,8 +18,6 @@ class Application {
   y: number
   startX: number
   startY: number
-  // lineColor: string
-  // shadowColor: string
   centerY: number
   rid: number
 

@@ -1,148 +1,207 @@
-<script setup lang='ts'>
-import colors from '@/contants/colors'
+<script setup>
+const { canvasRef, context, width } = useCanvas()
+let rid = 0
+const CSIZE = 400
+let t = 0
+let curves = []
+const hue = randomH()
+let eg = Math.random() < 0.3
+let inc = 3
+let stopped = true // 是否已暂停
+function getRandomInt(min, max, low) {
+  if (low)
+    return Math.floor(Math.random() * Math.random() * (max - min)) + min
+  else
+    return Math.floor(Math.random() * (max - min)) + min
+}
 
-const { canvasRef, context, width, height } = useCanvas()
-const { x, y } = useMouse()
-const points: Point[] = []
-const spacing = 100
-const spread = spacing * 0.25
-let cols: number, rows: number
-let tick: number, basePoint, rightPoint, botPoint
-
-class Point {
-  x: number
-  y: number
-  xBase: number
-  yBase: number
-  offset: number
-  duration: number
-  range: number
-  dir: number
-  rad: number
-  rotateAngle: number
-  constructor(opt: any) {
-    this.x = opt.x
-    this.y = opt.y
-    this.xBase = this.x
-    this.yBase = this.y
-    this.offset = random(0, 1000)
-    this.duration = random(20, 60)
-    this.range = random(3, 6)
-    this.dir = random(0, 1) > 0.5 ? 1 : -1
-    this.rad = random(2, 4)
-    this.rotateAngle = random(0, Math.PI * 2) // 随机旋转角度
+function randomH() {
+  return getRandomInt(0, 360)
+}
+class Circle {
+  constructor(x, y, xp, yp, radius, pc) {
+    this.x = x
+    this.y = y
+    this.xp = xp
+    this.yp = yp
+    this.radius = radius
+    this.pc = pc
+    this.c = []
   }
 
-  draw() {
-    if (!context.value)
-      return
-    context.value.save()
+  drawCircle(rf) {
     context.value.beginPath()
-    context.value.translate(this.x, this.y)
-    context.value.rotate(this.rotateAngle)
-    context.value.rect(-6, -6, 12, 12)
+    context.value.moveTo(this.x + this.radius * rf, this.y)
+    context.value.arc(this.x, this.y, this.radius * rf, 0, Math.PI * 2)
+    context.value.fillStyle = `hsl(${hue + 5 * this.radius},90%,50%)`
     context.value.fill()
-    context.value.stroke()
-    context.value.closePath()
-    context.value.restore()
-  }
-
-  update() {
-    this.x = this.xBase + this.dir * Math.sin((tick + this.offset) / this.duration) * this.range
-    this.y = this.yBase + this.dir * Math.cos((tick + this.offset) / this.duration) * this.range
-    const angle = angleTo(this, new Point({ x: x.value, y: y.value }))
-    this.x = this.x + Math.cos(angle) * 100
-    this.y = this.y + Math.sin(angle) * 100
   }
 }
-function angleTo(p1: Point, p2: Point) {
-  const dx = p1.x - p2.x
-  const dy = p1.y - p2.y
-  return Math.atan2(dy, dx)
-}
-function init() {
-  x.value = width.value / 2
-  y.value = height.value / 2
-  cols = 0
-  rows = 0
-  points.length = 0
-  tick = 0
-  context.value!.strokeStyle = 'green'
-  createPoints()
-}
 
-function random(min: number, max: number) {
-  return Math.random() * (max - min) + min
-}
+// 曲线
+class Curve {
+  constructor() {
+    this.car = []
+    this.to = -getRandomInt(0, 400)
+  }
 
-// 创建一些点，每个点都有一个随机的偏移量
-function createPoints() {
-  for (let x = -spacing / 2; x < width.value + spacing; x += spacing) {
-    cols++
-    for (let y = -spacing / 2; y < height.value + spacing; y += spacing) {
-      if (x === -spacing / 2)
-        rows++
-
-      points.push(new Point({
-        x: x + random(-spread, spread),
-        y: y + random(-spread, spread),
-      }))
+  canDrawCurve() {
+    const tt = this.to + t
+    context.value.setLineDash([Math.max(1, tt), 4000])
+    context.value.stroke(this.path)
+    if (tt > this.len + 40) {
+      this.car[this.car.length - 1].drawCircle(0.8)
+      return tt <= this.len + 120
+    }
+    else if (tt > this.len) {
+      const raf = 0.8 * (tt - this.len) / 40
+      this.car[this.car.length - 1].drawCircle(raf)
+      return true
+    }
+    else {
+      return true
     }
   }
+
+  addCurveCircle(cir) {
+    if (cir.pc) {
+      this.car.unshift(cir.pc)
+      this.addCurveCircle(cir.pc)
+    }
+  }
+
+  setPath() {
+    this.len = 0
+    this.path = new Path2D()
+    this.path.moveTo(0, 0)
+    this.path.lineTo(this.car[1].xp, this.car[1].yp)
+    this.len += this.car[0].radius
+    for (let i = 1; i < this.car.length - 1; i++) {
+      this.path.bezierCurveTo(this.car[i].x, this.car[i].y, this.car[i].x, this.car[i].y, this.car[i + 1].xp, this.car[i + 1].yp)
+      this.len += 2 * this.car[i].radius
+    }
+    this.path.lineTo(this.car[this.car.length - 1].x, this.car[this.car.length - 1].y)
+    this.len += this.car[this.car.length - 1].radius
+  }
 }
-let index = 0
-function draw() {
-  if (!context.value)
-    return
-  context.value?.clearRect(0, 0, width.value, height.value)
-  context.value.lineWidth = 2
+let circles = [new Circle(0, 0, 0, 0, 50, 0, 0)]
+function drawPoint(x, y, color) {
   context.value.beginPath()
-  if (index % 60 === 0) { // 每隔60帧清空画布，换颜色
-    context.value!.strokeStyle = colors[Math.floor(Math.random() * colors.length)]
-  }
-  for (let x = 0; x < cols; x++) {
-    for (let y = 0; y < rows; y++) {
-      basePoint = points[x * rows + y]
-      rightPoint = x === cols - 1 ? null : points[(x + 1) * rows + y]
-      botPoint = y === rows - 1 ? null : points[x * rows + y + 1]
+  context.value.arc(x, y, 5, 0, Math.PI * 2)
+  context.value.closePath()
+  context.value.fillStyle = color || 'red'
+  context.value.fill()
+}
 
-      if (rightPoint) {
-        context.value.moveTo(basePoint.x, basePoint.y)
-        context.value.lineTo(rightPoint.x, rightPoint.y)
-      }
-      if (botPoint) {
-        context.value.moveTo(basePoint.x, basePoint.y)
-        context.value.lineTo(botPoint.x, botPoint.y)
-      }
+// 判断是否在区域内，并不与任何圆相交
+function canGrow(x, y, r) {
+  if ((x * x + y * y) ** 0.5 > CSIZE - r)
+    return false
+  for (let i = 0; i < circles.length; i++) {
+    const rt = r + circles[i].radius
+    const xd = circles[i].x - x
+    const yd = circles[i].y - y
+    if (Math.abs(xd) > rt || Math.abs(yd) > rt)
+      continue
+    if ((xd * xd + yd * yd) ** 0.5 + 1 < rt)
+      return false
+  }
+  return true
+}
+
+function grow(r) {
+  const a = Math.PI * 2 * Math.random() // 半径
+  const c = eg
+    ? circles[circles.length - 1 - getRandomInt(0, circles.length, true)]
+    : circles[getRandomInt(0, circles.length)] // 取出一个弧
+  const x = c.x + (c.radius + r) * Math.cos(a)
+  const y = c.y + (c.radius + r) * Math.sin(a)
+  if (canGrow(x, y, r)) {
+    const xp = c.x + c.radius * Math.cos(a)
+    const yp = c.y + c.radius * Math.sin(a)
+    const circle = new Circle(x, y, xp, yp, r, c)
+    c.c.push(circle)
+    circles.push(circle)
+    return true
+  }
+  return false
+}
+
+function draw() {
+  context.value.clearRect(-CSIZE, -CSIZE, 2 * CSIZE, 2 * CSIZE)
+  let grown = 0
+  for (let i = 0; i < curves.length; i++) {
+    if (curves[i].canDrawCurve())
+      grown++
+  }
+  drawPoint(0, 0, 'silver')
+  return grown
+}
+
+function setCircles() {
+  circles = [new Circle(0, 0, 0, 0, 50, 0, 0)]
+  for (let i = 0; i < 2000; i++) {
+    let r = 10
+    if (i < 20)
+      r = 42
+    else if (i < 100)
+      r = 34
+    else if (i < 300)
+      r = 26
+    else if (i < 1000)
+      r = 18
+    grow(r)
+  }
+  curves = []
+  for (let i = 0; i < circles.length; i++) {
+    if (circles[i].c.length === 0) {
+      const nc = new Curve()
+      nc.car = [circles[i]]
+      nc.addCurveCircle(circles[i])
+      nc.setPath()
+      curves.push(nc)
     }
   }
-  context.value.stroke()
-  context.value.fillStyle = '#000'
-  points.forEach((point) => {
-    point.update()
-    point.draw()
-  })
-
-  // 画一个 径向渐变的圆
-  const gradient = context.value.createRadialGradient(x.value, y.value, 0, x.value, y.value, 400)
-  gradient.addColorStop(0, 'hsla(0, 0%, 0%, 0)')
-  gradient.addColorStop(1, 'hsla(0, 0%, 0%, 0.85)')
-  context.value.fillStyle = gradient
-  context.value.fillRect(0, 0, width.value, height.value)
 }
 function animate() {
-  index++
-  draw()
-  requestAnimationFrame(animate)
-}
+  cancelAnimationFrame(rid)
+  if (stopped)
+    return
+  t += inc
+  if (!draw() || t < 0) {
+    if (inc === 3) { inc = -8 }
+    else {
+      context.value.strokeStyle = `hsla(${randomH()},90%,60%,0.6)`
+      inc = 3
+      t = 0
+      eg = Math.random() < 0.3
+      setCircles()
+    }
+  }
 
-useResizeObserver(canvasRef, init)
+  rid = requestAnimationFrame(animate)
+}
+function start() {
+  if (stopped)
+    requestAnimationFrame(animate)
+
+  stopped = !stopped
+}
+function init() {
+  context.value.translate(width.value / 2, CSIZE)
+  context.value.lineCap = 'round'
+  context.value.fillStyle = 'green'
+  context.value.lineWidth = 5
+  context.value.strokeStyle = `hsla(${randomH()},90%,60%,0.6)`
+}
 onMounted(() => {
+  addEventListener('click', start, false)
+  setCircles()
   init()
-  animate()
+  start()
 })
 </script>
 
 <template>
-  <canvas ref="canvasRef" bg-black />
+  <canvas ref="canvasRef" />
 </template>

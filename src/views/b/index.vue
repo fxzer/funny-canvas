@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const { canvasRef, context, width, height } = useCanvas()
-const animationRequestId = ref(0)
+const { canvasRef, context, width, height } = useCanvas({ animate })
 const codeLines: string[] = [
   '                 _oo0oo_',
   '                o8888888o',
@@ -39,12 +38,11 @@ let col = 1
 // 初始化画布
 
 // 绘制代码
-function draw() {
+function animate() {
   if (context.value) {
     context.value.clearRect(0, 0, width.value, height.value)
     resume()
   }
-  animationRequestId.value = requestAnimationFrame(draw)
 }
 // 执行代码
 function resume() {
@@ -52,7 +50,7 @@ function resume() {
   context.value!.shadowBlur = 2
   context.value!.fillStyle = 'hsla(120,100%,20%,1)'
   const initx = width.value / 2 - 200
-  const inity = 100
+  const inity = 200
   context.value!.globalCompositeOperation = 'lighter'
   // 如果当前行是正在输入的那一行，只绘制到当前输入位置（col 列）。否则，绘制整行代码
   for (let i = 0; i <= row; i++) {
@@ -80,7 +78,6 @@ function resume() {
   if (row * 16 > window.innerHeight - 200)
     context.value!.translate(0, -0.5) // 滚动
 }
-onMounted(() => draw())
 </script>
 
 <template>

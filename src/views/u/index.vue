@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ init, animate })
 const particles: Particle[] = []
 const numbersData: number[][][] = []
 let count = 60
@@ -105,13 +105,7 @@ function animate() {
     index++
     index = index % numbersData.length
   }
-  requestAnimationFrame(animate)
 }
-
-onMounted(() => {
-  init()
-  animate()
-})
 </script>
 
 <template>

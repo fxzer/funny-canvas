@@ -1,7 +1,8 @@
 <script setup lang='ts'>
 import * as THREE from 'three'
 
-let renderer, scene, camera, composer, circle, skelet, particle
+let requestAnimationId = 0
+let renderer, scene, camera, circle, skelet, particle
 
 onMounted(() => {
   init()
@@ -91,7 +92,8 @@ function onWindowResize() {
 }
 
 function animate() {
-  requestAnimationFrame(animate)
+  cancelAnimationFrame(requestAnimationId)
+  requestAnimationId = requestAnimationFrame(animate)
 
   particle.rotation.x += 0.0000
   particle.rotation.y -= 0.0040

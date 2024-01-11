@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import colors from '@/contants/colors'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ init, animate })
 let particles: Particle[] = []
 
 function randomIntFromRange(min: number, max: number) {
@@ -36,7 +36,7 @@ class Particle {
     this.y = y
     this.radius = radius
     this.color = color
-    this.velocity = 0.06
+    this.velocity = 0.03
     this.distanceFromCenter = randomIntFromRange(50, 160)
     this.lastMouse = { x, y }
   }
@@ -77,10 +77,8 @@ function init() {
     particles.push(new Particle(width.value / 2, height.value / 2, radius, randomColor(colors)))
   }
 }
-let rafId = 0
 const isDark = useDark()
 function animate() {
-  rafId = requestAnimationFrame(animate)
   if (context.value) {
     context.value.fillStyle = isDark.value ? 'rgba(0,0,0,0.05)' : 'rgba(255, 255, 255, 0.05)'
     context.value.fillRect(0, 0, width.value, height.value)
@@ -89,13 +87,6 @@ function animate() {
     particle.update()
   })
 }
-watchEffect(() => {
-  cancelAnimationFrame(rafId)
-  animate()
-})
-
-init()
-animate()
 </script>
 
 <template>

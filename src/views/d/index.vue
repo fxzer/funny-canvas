@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-const isDark = useDark()
-const { x, y } = useMouse()
-const { canvasRef, context, width, height } = useCanvas()
+import colors from '@/contants/colors'
 
+const isDark = useDark()
+const { canvasRef, context, width, height } = useCanvas({ animate })
+const { x, y } = useMouseInElement(canvasRef)
 const mouseRadius = 200
-let particlesArray: Particle[] = []
+let rindex = 0
+let particles: Particle[] = []
 /* 自定义例子颜色，数量，密度 */
 class Particle { // 粒子
   x: number
@@ -20,12 +22,15 @@ class Particle { // 粒子
     this.size = 4 // 粒子大小
     this.baseX = this.x // 粒子初始位置
     this.baseY = this.y // 粒子初始位置
-    this.density = (Math.random() * 10) + 1 // 粒子密度
+    this.density = (Math.random() * 20) + 1 // 粒子密度
   }
 
   draw() {
     context.value?.beginPath()
-    context.value!.fillStyle = 'green'
+    if (rindex < 180)
+      context.value!.fillStyle = 'green'
+    else
+      context.value!.fillStyle = colors[Math.floor(Math.random() * colors.length)]
     context.value?.arc(this.x, this.y, this.size, 0, Math.PI * 2)
     context.value?.closePath()
     context.value?.fill()
@@ -63,19 +68,19 @@ class Particle { // 粒子
 }
 function fillText() {
   /* 文字粒子 */
-  particlesArray = []
+  particles = []
   const fontSize = 40
-  const text = 'ABC'
-  const adjustX = Math.floor((width.value - context.value!.measureText('A').width) / 3.5) - 400
-  const adjustY = Math.floor((height.value - fontSize * 10) / 4)
+  const text = '彩云'
   context.value!.font = `${fontSize}px Verdana` // 字体大小
-  context.value?.fillText(text, 0, fontSize - (0.2 * fontSize), width.value) // 让文字初始化在 canvas 最左上角
+  context.value?.fillText(text, 0, fontSize - 10, width.value) // 让文字初始化在 canvas 最左上角
+  const adjustX = width.value / 2 - context.value!.measureText(text).width * 20 / 2
+  const adjustY = Math.floor((height.value - fontSize * 10) / 4)
   const textCoordinates = context.value?.getImageData(0, 0, width.value, height.value)
   const { width: w = 0, height: h = 0, data = [] } = textCoordinates || {}
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
       if (data[(y * 4 * w) + (x * 4) + 3] > 128)
-        particlesArray.push(new Particle(x * 20 + adjustX, y * 20 + adjustY))
+        particles.push(new Particle(x * 20 + adjustX, y * 20 + adjustY))
     }
   }
 }
@@ -85,10 +90,10 @@ const strokePre = ref<string>('rgba(255,255,255,')
 // 粒子连接线
 function connect() {
   let opacity = 0.6
-  for (let a = 0; a < particlesArray.length; a++) {
-    for (let b = a; b < particlesArray.length; b++) {
-      const dx = particlesArray[a].x - particlesArray[b].x
-      const dy = particlesArray[a].y - particlesArray[b].y
+  for (let a = 0; a < particles.length; a++) {
+    for (let b = a; b < particles.length; b++) {
+      const dx = particles[a].x - particles[b].x
+      const dy = particles[a].y - particles[b].y
       const distance = Math.sqrt(dx * dx + dy * dy)
       const maxDistance = 30
       if (distance < maxDistance) {
@@ -96,8 +101,8 @@ function connect() {
         context.value!.strokeStyle = `${strokePre.value}${opacity})`
         context.value?.beginPath()
         context.value!.lineWidth = 1.8
-        context.value?.moveTo(particlesArray[a].x, particlesArray[a].y)
-        context.value?.lineTo(particlesArray[b].x, particlesArray[b].y)
+        context.value?.moveTo(particles[a].x, particles[a].y)
+        context.value?.lineTo(particles[b].x, particles[b].y)
         context.value?.stroke()
       }
     }
@@ -105,23 +110,22 @@ function connect() {
 }
 // 动画
 function animate() {
-  if (!context.value || !canvasRef.value)
-    return
+  rindex++
   context.value?.clearRect(0, 0, width.value, height.value)
-  for (let i = 0; i < particlesArray.length; i++) {
-    particlesArray[i].draw()
-    particlesArray[i].update()
+  for (let i = 0; i < particles.length; i++) {
+    particles[i].draw()
+    particles[i].update()
   }
   connect()
-  requestAnimationFrame(animate)
 }
 watchEffect(() => {
   strokePre.value = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
 })
-
 onMounted(() => {
   fillText()
-  animate()
+})
+window.addEventListener('resize', () => {
+  window.location.reload()
 })
 </script>
 

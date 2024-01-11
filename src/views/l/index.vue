@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { context, canvasRef, width, height } = useCanvas()
+const { context, canvasRef, width, height } = useCanvas({ init, animate })
 interface Point {
   x: number
   y: number
@@ -67,16 +67,11 @@ function frame() {
 }
 
 let framesCount = 0
-function startFrame() {
-  requestAnimationFrame(() => {
-    framesCount += 1
-    if (framesCount % 3 === 0) // 每3帧执行一次
-      frame()
-    startFrame()
-  })
+function animate() {
+  framesCount += 1
+  if (framesCount % 3 === 0) // 每3帧执行一次
+    frame()
 }
-
-startFrame()
 
 function lineTo(p1: Point, p2: Point) {
   context.value!.beginPath()
@@ -96,10 +91,6 @@ function getEndPoint(b: Branch): Point {
 function drawBranch(b: Branch) {
   lineTo(b.start, getEndPoint(b))
 }
-
-onMounted(() => {
-  init()
-})
 </script>
 
 <template>

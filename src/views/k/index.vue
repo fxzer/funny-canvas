@@ -1,7 +1,7 @@
 <script setup>
 import Play from '@/components/Play.vue'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 const audio1 = ref()
 const audio2 = ref()
 const audio3 = ref()
@@ -14,7 +14,7 @@ const audioGroup1 = [audio1, audio2, audio3]
 const audioGroup2 = [audio4, audio5, audio6]
 const audioGroup3 = [audio7, audio8]
 let fireworks = []
-
+const play = ref(false)
 function randNumber(min, max) {
   return Math.random() * (max - min) + min
 }
@@ -110,12 +110,14 @@ class Firework {
   }
 }
 
-function initFirework() {
+function init() {
   fireworks = Array.from({ length: 10 }).map(() => {
     return new Firework(width.value * Math.random(), randNumber(height.value / 2, height.value), 0, -10, randNumber(100, 1000))
   })
 }
-function amimate() {
+function animate() {
+  if (!play.value)
+    return
   context.value.clearRect(0, 0, width.value, height.value)
   fireworks.forEach(async (firework) => {
     if (firework.delay <= 0) { // 延迟时间已过
@@ -132,19 +134,18 @@ function amimate() {
       firework.delay -= 16 // 每帧减少16毫秒
     }
   })
-  requestAnimationFrame(amimate)
 }
 const showPlayBtn = ref(true)
 function playHandler() {
-  amimate()
+  play.value = true
   setTimeout(() => {
     showPlayBtn.value = false
   }, 100)
 }
 onMounted(() => {
-  initFirework()
+  init()
   setInterval(() => {
-    initFirework()
+    init()
   }, 5000)
 })
 </script>

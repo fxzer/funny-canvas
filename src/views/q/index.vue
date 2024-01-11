@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import colors from '@/contants/colors'
 
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ init, animate})
 const halfWidth = computed(() => { return width.value / 2 })
 const halfHeight = computed(() => { return height.value / 2 })
 
@@ -62,14 +62,12 @@ function init() {
     particles.push(new Particle(x, y, radius, randomColor(colors)))
   }
 }
-let rafId = 0.01
 const isDark = useDark()
 let radians = 0
 const radian = ref(0.001)
 const alpha = ref(1)
 const { pressed } = useMousePressed({ target: canvasRef })
 function animate() {
-  rafId = requestAnimationFrame(animate)
   if (context.value) {
     context.value.fillStyle = isDark.value ? `rgba(0,0,0,${alpha.value})` : `rgba(255, 255, 255,${alpha.value})`
     context.value.fillRect(0, 0, width.value, height.value)
@@ -89,10 +87,6 @@ function animate() {
   else if (!pressed.value && alpha.value < 1)
     alpha.value += 0.01
 }
-watchEffect(() => {
-  cancelAnimationFrame(rafId)
-  animate()
-})
 let i = 1
 function speedUp() {
   i += 1
@@ -104,8 +98,6 @@ function speedUp() {
     radian.value = 0.001
   }
 }
-init()
-animate()
 </script>
 
 <template>

@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 
 const { x } = useMouse()
 const bar = {
@@ -81,12 +81,8 @@ class Bar {
   }
 }
 
-function animationLoop() {
-  context.value?.clearRect(0, 0, width.value, height.value)
-  drawScene()
-  requestAnimationFrame(animationLoop)
-}
-function drawScene() {
+function animate() {
+   context.value?.clearRect(0, 0, width.value, height.value)
   bars.forEach((b) => {
     b.update()
     b.draw()
@@ -102,7 +98,6 @@ function resizeReset() {
 onMounted(() => {
   window.addEventListener('resize', resizeReset)
   resizeReset()
-  animationLoop()
 })
 </script>
 

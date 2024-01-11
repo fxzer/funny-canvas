@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { x, y } = useMouse()
-const { canvasRef, context, width, height } = useCanvas()
+const { canvasRef, context, width, height } = useCanvas({ animate })
 
 interface Particle {
   x: number
@@ -16,15 +16,13 @@ const connectionOpacity = 0.2
 const isDark = useDark()
 const particleColor = ref(isDark.value ? '#fff' : '#000')
 const lineColor = ref(isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,')
-const debounceResize = useDebounceFn(createParticles, 500)
+const debounceResize = useDebounceFn(init, 500)
 watchEffect(() => {
   particleColor.value = isDark.value ? '#fff' : '#000'
   lineColor.value = isDark.value ? 'rgba(255,255,255,' : 'rgba(0,0,0,'
 })
 
-function createParticles() {
-  if (!canvasRef.value)
-    return
+function init() {
   particles.value = []
   for (let i = 0; i < 100; i++) {
     const particle: Particle = {
@@ -36,9 +34,8 @@ function createParticles() {
     particles.value.push(particle)
   }
 }
-const requestAnimationId = ref(0)
 
-function animateParticles() {
+function animate() {
   if (!context.value || !canvasRef.value)
     return
   context.value.clearRect(0, 0, width.value, height.value)
@@ -59,12 +56,12 @@ function animateParticles() {
     // 如果<180并且大于120，则吸引
     if (x.value && y.value && distance < attrtchDistance && distance > connectionDistance) {
       if (distance < connectionDistance + 10) {
-        particle.x += (x.value - particle.x) * 0.002
-        particle.y += (y.value - particle.y) * 0.002
+        particle.x += (x.value - particle.x) * 0.01
+        particle.y += (y.value - particle.y) * 0.01
       }
       else {
-        particle.x += (x.value - particle.x) * 0.02
-        particle.y += (y.value - particle.y) * 0.02
+        particle.x += (x.value - particle.x) * 0.01
+        particle.y += (y.value - particle.y) * 0.01
       }
     }
     else {
@@ -103,23 +100,12 @@ function animateParticles() {
       }
     })
   })
-
-  requestAnimationId.value = requestAnimationFrame(animateParticles)
 }
 
-onMounted(() => {
-  createParticles()
-  animateParticles()
-  window.addEventListener('resize', debounceResize)
-})
-
-onBeforeUnmount(() => {
-  cancelAnimationFrame(requestAnimationId.value)
-})
+init()
+window.addEventListener('resize', debounceResize)
 </script>
 
 <template>
-  <!-- <div ref="wrap" class="w-full h-full"> -->
   <canvas ref="canvasRef" />
-  <!-- </div> -->
 </template>
