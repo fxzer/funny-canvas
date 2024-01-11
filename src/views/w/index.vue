@@ -2,7 +2,7 @@
 import * as THREE from 'three'
 
 let requestAnimationId = 0
-let renderer, scene, camera, circle, skelet, particle
+let renderer:any, scene:any, camera:any, circle:any, skelet:any, particle:any
 
 onMounted(() => {
   init()
