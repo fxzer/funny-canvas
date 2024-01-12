@@ -5,7 +5,9 @@ const isDark = useDark()
 const { canvasRef, context, width, height } = useCanvas({ animate })
 const { x, y } = useMouseInElement(canvasRef)
 const mouseRadius = 200
+const MAX_PARTICLES = 1000
 let rindex = 0
+const text = ref('XY')
 let particles: Particle[] = []
 /* 自定义例子颜色，数量，密度 */
 class Particle { // 粒子
@@ -70,17 +72,20 @@ function fillText() {
   /* 文字粒子 */
   particles = []
   const fontSize = 40
-  const text = '彩云'
   context.value!.font = `${fontSize}px Verdana` // 字体大小
-  context.value?.fillText(text, 0, fontSize - 10, width.value) // 让文字初始化在 canvas 最左上角
-  const adjustX = width.value / 2 - context.value!.measureText(text).width * 20 / 2
+  context.value?.fillText(text.value, 0, fontSize - 10, width.value) // 让文字初始化在 canvas 最左上角
+  const adjustX = width.value / 2 - context.value!.measureText(text.value).width * 20 / 2
   const adjustY = Math.floor((height.value - fontSize * 10) / 4)
   const textCoordinates = context.value?.getImageData(0, 0, width.value, height.value)
+  context.value?.clearRect(0, 0, width.value, height.value)
   const { width: w = 0, height: h = 0, data = [] } = textCoordinates || {}
   for (let x = 0; x < w; x++) {
     for (let y = 0; y < h; y++) {
-      if (data[(y * 4 * w) + (x * 4) + 3] > 128)
+      if (data[(y * 4 * w) + (x * 4) + 3] > 128) {
+        if (particles.length >= MAX_PARTICLES)
+          break
         particles.push(new Particle(x * 20 + adjustX, y * 20 + adjustY))
+      }
     }
   }
 }
@@ -124,11 +129,16 @@ watchEffect(() => {
 onMounted(() => {
   fillText()
 })
+watchDebounced(text, () => {
+  fillText()
+}, { debounce: 1000, maxWait: 5000 })
+
 window.addEventListener('resize', () => {
   window.location.reload()
 })
 </script>
 
 <template>
+  <input v-model="text" type="text" class="fixed left-2 mx-auto w-52 bg-gray/20 rounded top-2">
   <canvas ref="canvasRef" />
 </template>
