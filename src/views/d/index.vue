@@ -139,6 +139,6 @@ window.addEventListener('resize', () => {
 </script>
 
 <template>
-  <input v-model="text" type="text" class="fixed left-2 mx-auto w-52 bg-gray/20 rounded top-2">
+  <input v-model="text" type="text" class="fixed left-2 mx-auto w-52 bg-gray/20 rounded top-2 py-1 px-2 outline-none">
   <canvas ref="canvasRef" />
 </template>
