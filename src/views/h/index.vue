@@ -5,7 +5,7 @@ const audioFile = ref<HTMLInputElement>()
 const atx = ref<AudioContext | null>(null)
 const analyser = ref<AnalyserNode | null>(null)
 let dataArray: any = []
-const musicName = ref('The theme of Bangaichi.mp3')
+const musicName = ref('Dream It Possible.mp3')
 const requestAnimationFrameId = ref(0)
 const loading = ref(false)
 function initAudio() {
@@ -38,7 +38,7 @@ function initAudio() {
 // 处理选择的音频文件
 function handleAudioFileChange(e: any) {
   // 获取音频文件名字
-  musicName.value = e.target.files[0].name || 'The theme of Bangaichi.mp3'
+  musicName.value = e.target.files[0].name || 'Dream It Possible.mp3'
   if (audioFile.value?.files && audioFile.value.files[0]) {
     loading.value = true
     const reader = new FileReader()
@@ -96,14 +96,14 @@ onMounted(() => {
     <div
       class="w-80 left-0 right-0 mx-auto z-50 bg-white/50  backdrop-blur absolute bottom-36 rounded-full overflow-hidden flex-y-center"
     >
-      <label for="upload" class="font-mono text-purple-600 rounded-sm bg-purple-500/10  px-2 py-1">选择文件</label>
+      <label for="upload" class="font-mono text-purple-600 rounded-sm bg-purple-500/10 z-10 cursor-pointer px-2 py-1">选择文件</label>
       <span class=" text-blue-600 bg-blue-600/10  px-2 py-1 truncate flex-1">{{ musicName }}</span>
     </div>
     <div v-if="loading" class="loading text-3xl  text-violet-600 bg-white/30 p-6  backdrop-blur absolute top-1/2 left-1/2 translate-1/2">
       加载中...
     </div>
     <audio ref="audioA" controls class="w-80 left-0 right-0 mx-auto z-50 absolute bottom-20 ">
-      <source src="../../assets/music/bangaichi.mp3">
+      <source src="../../assets/music/dream.mp3">
     </audio>
   </div>
 </template>

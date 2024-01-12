@@ -8,7 +8,7 @@ const CAMERA_SIZE_Y = 480
 const BUTTERFLY_NUM = 12
 const butterflies = []
 
-const SIZE = 100
+const SIZE = 200
 
 class Butterfly {
   constructor(i, texture) {
@@ -276,4 +276,5 @@ onMounted(() => {
 
 <template>
   <canvas id="canvas-webgl" backdrop-blur bg-white />
+  <a href="https://ykob.github.io/sketch-threejs/sketch/butterfly.html" target="_blank" class="text-zine-500 hover:text-blue-500 fixed z-100 bottom-2 left-2">The source code</a>
 </template>
